@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#351f56">
+  <title>Las aventuras de Jesús</title>
+  <meta
+    name="description"
+    content="Menú principal de Las aventuras de Jesús, un camino de fe y esperanza."
+  >
+  <link rel="preload" href="assets/fondo-menu.png" as="image">
+  <link rel="stylesheet" href="styles.css?v=20260807-1">
+  <link rel="stylesheet" href="game-settings.css">
+</head>
+<body>
+  <main class="menu-shell" aria-labelledby="game-title">
+    <div class="sky-shade" aria-hidden="true"></div>
+
+    <section class="menu-card" aria-label="Menú principal">
+      <div class="title-lockup">
+        <p class="eyebrow">Juego bíblico para toda la familia</p>
+        <h1 id="game-title">Las aventuras de Jesús</h1>
+        <p class="subtitle">Un camino de fe y esperanza</p>
+      </div>
+
+      <nav class="menu-actions" aria-label="Opciones del juego">
+        <button class="menu-button primary" type="button" data-action="start">
+          <span class="button-icon" aria-hidden="true">▶</span>
+          <span>
+            <strong>Comenzar aventura</strong>
+            <small>Inicia el recorrido desde Caná</small>
+          </span>
+        </button>
+
+        <button class="menu-button" type="button" data-action="continue" disabled>
+          <span class="button-icon" aria-hidden="true">↻</span>
+          <span>
+            <strong>Continuar</strong>
+            <small id="continue-detail">Aún no hay una partida guardada</small>
+          </span>
+        </button>
+
+        <button class="menu-button" type="button" data-action="settings">
+          <span class="button-icon" aria-hidden="true">⚙</span>
+          <span>
+            <strong>Configuración</strong>
+            <small>Idioma, audio, accesibilidad y controles</small>
+          </span>
+        </button>
+
+        <button class="menu-button" type="button" data-action="credits">
+          <span class="button-icon" aria-hidden="true">©</span>
+          <span>
+            <strong>Créditos y licencias</strong>
+            <small>Música, autores y elementos originales</small>
+          </span>
+        </button>
+
+        <div class="store-row" aria-label="Descargas para móviles">
+          <button class="menu-button compact" type="button" data-action="android">
+            <span class="button-icon" aria-hidden="true">◆</span>
+            <span>
+              <strong>Descargar para Android</strong>
+              <small>Google Play</small>
+            </span>
+          </button>
+
+          <button class="menu-button compact" type="button" data-action="ios">
+            <span class="button-icon" aria-hidden="true">●</span>
+            <span>
+              <strong>Descargar para iPhone y iPad</strong>
+              <small>App Store</small>
+            </span>
+          </button>
+        </div>
+
+        <button class="menu-button church-link" type="button" data-action="church">
+          <span class="button-icon" aria-hidden="true">✦</span>
+          <span>
+            <strong>Conoce Iglesia de Cristo Ecuador</strong>
+            <small>Donde la verdad de Cristo transforma vidas</small>
+          </span>
+        </button>
+      </nav>
+
+      <div class="menu-footer">
+        <button
+          class="sound-button"
+          type="button"
+          data-action="sound"
+          aria-pressed="true"
+          aria-label="Silenciar música"
+        >
+          <span aria-hidden="true" id="sound-icon">🔊</span>
+          <span id="sound-label">Música activada</span>
+        </button>
+        <p>El progreso se guarda automáticamente.</p>
+      </div>
+    </section>
+  </main>
+
+  <audio id="menu-music" loop preload="metadata">
+    <source src="assets/audio-menu-converge.mp3" type="audio/mpeg">
+  </audio>
+
+  <dialog id="info-dialog" class="menu-dialog">
+    <form method="dialog">
+      <h2 id="dialog-title">Información</h2>
+      <p id="dialog-message"></p>
+      <div id="dialog-extra"></div>
+      <div class="dialog-actions">
+        <button class="dialog-button secondary" value="cancel">Volver</button>
+        <button class="dialog-button primary" id="dialog-confirm" value="confirm">
+          Entendido
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="credits-dialog" class="menu-dialog credits-dialog" aria-labelledby="credits-title">
+    <article class="credits-dialog-card">
+      <header class="credits-dialog-header">
+        <h2 id="credits-title">Créditos y licencias</h2>
+        <button id="credits-close" class="credits-close" type="button" aria-label="Cerrar créditos">×</button>
+      </header>
+
+      <div class="credits-dialog-body">
+        <section>
+          <h3>MÚSICA</h3>
+
+          <h4>Scott Buckley</h4>
+          <p>Música utilizada bajo licencia Creative Commons Attribution 4.0 International (CC BY 4.0).</p>
+          <ul>
+            <li>“Convergence”</li>
+            <li>“Sanctum”</li>
+            <li>“The Fury”</li>
+            <li>“Phoenix”</li>
+            <li>“Eyes In The Void”</li>
+            <li>“Starfire”</li>
+            <li>“Song Of The Forge”</li>
+            <li>“Memories Of Stone”</li>
+            <li>“Born Of The Sky”</li>
+          </ul>
+          <p>
+            Fuente oficial:
+            <a href="https://www.scottbuckley.com.au/" target="_blank" rel="noopener noreferrer">Scott Buckley Music · www.scottbuckley.com.au</a>
+          </p>
+          <p><a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">Licencia CC BY 4.0</a></p>
+        </section>
+
+        <section>
+          <h4>Cjbeards</h4>
+          <p>“Fire and Thunder”</p>
+          <p><a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer">Creative Commons Attribution 3.0 Unported (CC BY 3.0)</a></p>
+        </section>
+
+        <section>
+          <h4>Hayden Folker</h4>
+          <p>“Lock And Load”</p>
+          <p><a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer">Creative Commons Attribution 3.0 Unported (CC BY 3.0)</a></p>
+        </section>
+
+        <section>
+          <h4>Savfk / Saverio Blasi</h4>
+          <p>“The Grid”</p>
+          <p><a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">Creative Commons Attribution 4.0 International (CC BY 4.0)</a></p>
+        </section>
+
+        <section class="original-work-notice">
+          <h3>© 2026 George Sánchez</h3>
+          <h4>“Las aventuras de Jesús”</h4>
+          <p>Todos los derechos reservados sobre los elementos originales del videojuego.</p>
+          <p>Las composiciones musicales y demás recursos de terceros identificados en estos créditos permanecen bajo la propiedad de sus respectivos autores y se utilizan conforme a las licencias indicadas.</p>
+          <p>La utilización de estas obras no implica patrocinio, asociación ni respaldo del videojuego por parte de los respectivos compositores.</p>
+        </section>
+      </div>
+    </article>
+  </dialog>
+
+  <script src="game-settings.js"></script>
+  <script src="menu.js?v=20260807-3"></script>
+</body>
+</html>

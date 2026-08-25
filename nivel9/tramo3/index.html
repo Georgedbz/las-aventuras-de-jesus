@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#173e59">
+  <title>Senderos de Luz — Tramo 3</title>
+  <link rel="stylesheet" href="styles.css?v=puzzle-ampliado-20260816">
+</head>
+<body>
+  <main class="game-shell">
+    <section class="control-bar" aria-label="Controles del juego">
+      <label class="level-control" for="levelSelect">
+        <span>Nivel</span>
+        <select id="levelSelect" aria-label="Seleccionar nivel"></select>
+      </label>
+      <div class="stats" aria-live="polite">
+        <span>Movimientos <strong id="moveCount">0</strong></span>
+        <span>Mejor <strong id="bestMoves">—</strong></span>
+      </div>
+      <div class="button-group">
+        <button id="restartButton" class="text-button" type="button">↻ Reiniciar</button>
+        <button id="soundButton" class="icon-button" type="button" aria-pressed="true" aria-label="Desactivar sonido">🔊</button>
+      </div>
+    </section>
+
+    <section class="play-area">
+      <div id="board" class="board" role="grid" aria-label="Tablero de senderos de luz"></div>
+      <div class="legend" aria-label="Leyenda">
+        <span><i class="legend-source">✦</i> Fuente</span>
+        <span><i class="legend-lamp">●</i> Lámpara</span>
+        <span class="hint">Toca una pieza para girarla</span>
+      </div>
+    </section>
+
+    <div id="statusMessage" class="status-message" role="status" aria-live="polite">Conecta todas las lámparas</div>
+  </main>
+
+  <div id="completionPanel" class="completion-panel" hidden>
+    <div class="completion-card" role="dialog" aria-modal="true" aria-labelledby="completionTitle">
+      <div class="completion-rays" aria-hidden="true">✦</div>
+      <p class="completion-kicker">¡La esperanza alumbra el camino!</p>
+      <h2 id="completionTitle">Nivel completado</h2>
+      <p id="completionText"></p>
+      <button id="nextButton" type="button">Siguiente nivel →</button>
+    </div>
+  </div>
+
+  <script src="game.js?v=siete-niveles-fuentes-fijas-20260714"></script>
+</body>
+</html>

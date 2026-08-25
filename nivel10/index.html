@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#090b25">
+  <title>Nivel 10 — Luz sobre el Abismo</title>
+  <meta name="description" content="Nivel final de Las aventuras de Jesús: seis pruebas extensas y una confrontación simbólica entre la luz y las tinieblas.">
+  <link rel="preload" as="image" href="assets/jesus-walk-1.webp">
+  <link rel="preload" as="image" href="assets/jesus-walk-2.webp">
+  <link rel="stylesheet" href="styles.css?v=20260807-1">
+</head>
+<body>
+  <main class="level-shell">
+    <section class="mission-strip" aria-live="polite">
+      <div class="mission-copy">
+        <strong id="phase-title">Prueba 1 de 6 · La oscuridad de la mentira</strong>
+        <span id="phase-objective">Recorre el Abismo y encuentra 15 luces de la Verdad.</span>
+      </div>
+
+      <div class="mission-tools">
+        <button id="sound-toggle" class="icon-button" type="button" aria-label="Desactivar música" title="Activar o desactivar música">🔊</button>
+        <button id="pause-toggle" class="icon-button" type="button" aria-label="Pausar juego" title="Pausar o continuar (P o Escape)">⏸</button>
+        <div class="resistance-panel" aria-label="Resistencia">
+          <div class="resistance-heading">
+            <span>Resistencia</span>
+            <strong id="resistance-value">100%</strong>
+          </div>
+          <div class="resistance-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
+            <span id="resistance-fill"></span>
+          </div>
+        </div>
+        <div class="mission-status">
+          <span id="checkpoint-label">✓ Guardado</span>
+          <strong id="objective-counter">✦ 0 / 15</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="game-frame" aria-label="Área de juego">
+      <canvas id="game" width="960" height="540" tabindex="0" aria-label="Nivel final. Usa izquierda y derecha para moverte, arriba para saltar, abajo para agacharte, Shift para correr y E para usar la luz. En la prueba 6 pulsa Abajo dos veces para descender a una plataforma inferior. En celular utiliza los botones táctiles bajo el escenario."></canvas>
+      <div class="message-toast" id="message-toast" role="status" aria-live="polite"></div>
+
+      <div class="screen-overlay visible" id="intro-overlay">
+        <article class="story-card intro-card">
+          <p class="story-eyebrow">La última misión</p>
+          <h2>La luz vence a las tinieblas</h2>
+          <p>
+            Recorre seis pruebas extensas. Satanás permanecerá al acecho,
+            pero la Verdad, la Fe, el Amor y la Esperanza alumbrarán el camino.
+          </p>
+
+          <div class="legend desktop-legend" aria-label="Controles para computadora">
+            <span><b>← →</b> Mover</span>
+            <span><b>↑ / ↓</b> Saltar / agacharse</span>
+            <span><b>Shift</b> Correr</span>
+            <span><b>E · P</b> Acción / pausa</span>
+          </div>
+
+          <div class="legend mobile-legend" aria-label="Controles para celular">
+            <span><b>◀ ▶</b> Mover</span>
+            <span><b>Saltar</b> Subir</span>
+            <span><b>Agachar</b> Esquivar</span>
+            <span><b>Correr / Acción / ⏸</b> Acciones</span>
+          </div>
+          <p class="mobile-note">En celular aparecerán botones grandes debajo del escenario.</p>
+          <p class="save-note">El avance se guarda al terminar cada prueba.</p>
+          <button class="story-button" id="start-level" type="button">Comenzar la misión</button>
+        </article>
+      </div>
+
+      <div class="screen-overlay" id="pause-overlay">
+        <article class="story-card compact-card pause-card">
+          <p class="story-eyebrow">Partida en pausa</p>
+          <h2>La misión espera</h2>
+          <p>Tu posición, resistencia y progreso permanecen exactamente igual.</p>
+          <button class="story-button" id="resume-level" type="button">Continuar jugando</button>
+          <p class="pause-hint">También puedes pulsar P o Escape.</p>
+        </article>
+      </div>
+
+      <div class="screen-overlay" id="phase-overlay">
+        <article class="story-card compact-card">
+          <p class="story-eyebrow" id="phase-card-kicker">Punto de guardado</p>
+          <h2 id="phase-card-title">La verdad permanece</h2>
+          <p id="phase-card-message"></p>
+          <button class="story-button" id="continue-phase" type="button">Continuar</button>
+        </article>
+      </div>
+
+      <div class="screen-overlay" id="defeat-overlay">
+        <article class="story-card compact-card">
+          <p class="story-eyebrow">La esperanza permanece</p>
+          <h2>Vuelve a levantarte</h2>
+          <p>La prueba actual se reiniciará con 50% de resistencia. Las pruebas superadas permanecen guardadas.</p>
+          <button class="story-button" id="retry-phase" type="button">Reintentar la prueba</button>
+        </article>
+      </div>
+
+      <div class="screen-overlay dialogue-overlay" id="dialogue-overlay">
+        <article class="story-card dialogue-card">
+          <p class="story-eyebrow" id="dialogue-speaker">Jesús</p>
+          <h2 id="dialogue-title">La Palabra permanece</h2>
+          <blockquote id="dialogue-text"></blockquote>
+          <p class="verse-reference" id="dialogue-reference"></p>
+          <button class="story-button" id="dialogue-next" type="button">Continuar</button>
+        </article>
+      </div>
+
+      <div class="screen-overlay cinematic-overlay" id="victory-overlay">
+        <article class="story-card victory-card">
+          <div class="ascension-scene" aria-hidden="true">
+            <div class="heaven-light"></div>
+            <img class="ascending-jesus" src="assets/jesus-walk-1.webp" alt="">
+            <div class="disciples">
+              <span class="disciple disciple-a"><i class="disciple-head"></i><i class="disciple-body"></i><i class="disciple-arms"></i></span>
+              <span class="disciple disciple-b"><i class="disciple-head"></i><i class="disciple-body"></i><i class="disciple-arms"></i></span>
+              <span class="disciple disciple-c"><i class="disciple-head"></i><i class="disciple-body"></i><i class="disciple-arms"></i></span>
+              <span class="disciple disciple-d"><i class="disciple-head"></i><i class="disciple-body"></i><i class="disciple-arms"></i></span>
+              <span class="disciple disciple-e"><i class="disciple-head"></i><i class="disciple-body"></i><i class="disciple-arms"></i></span>
+              <span class="disciple disciple-f"><i class="disciple-head"></i><i class="disciple-body"></i><i class="disciple-arms"></i></span>
+            </div>
+          </div>
+          <div class="credits-copy">
+            <p class="story-eyebrow">Aventura completada</p>
+            <h2>La esperanza está viva</h2>
+            <blockquote>Jesús vive, reina y volverá. Su luz alcanza a toda persona que camina con fe.</blockquote>
+            <p class="verse-reference">Hechos 1:9-11 · Apocalipsis 1:17-18 · Apocalipsis 21:4</p>
+            <div class="credits-roll" aria-label="Créditos">
+              <strong>Las aventuras de Jesús</strong>
+              <span>Historia, esperanza y fe para toda la familia</span>
+              <span>Iglesia de Cristo Ecuador</span>
+              <section class="music-credits">
+                <h3>MÚSICA</h3>
+
+                <h4>Scott Buckley</h4>
+                <p>Música utilizada bajo licencia Creative Commons Attribution 4.0 International (CC BY 4.0).</p>
+                <ul>
+                  <li>“Convergence”</li>
+                  <li>“Sanctum”</li>
+                  <li>“The Fury”</li>
+                  <li>“Phoenix”</li>
+                  <li>“Eyes In The Void”</li>
+                  <li>“Starfire”</li>
+                  <li>“Song Of The Forge”</li>
+                  <li>“Memories Of Stone”</li>
+                  <li>“Born Of The Sky”</li>
+                </ul>
+                <p>Fuente oficial: <a href="https://www.scottbuckley.com.au/" target="_blank" rel="noopener noreferrer">Scott Buckley Music · www.scottbuckley.com.au</a></p>
+                <p><a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">Licencia CC BY 4.0</a></p>
+
+                <h4>Cjbeards</h4>
+                <p>“Fire and Thunder”</p>
+                <p><a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer">Creative Commons Attribution 3.0 Unported (CC BY 3.0)</a></p>
+
+                <h4>Hayden Folker</h4>
+                <p>“Lock And Load”</p>
+                <p><a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer">Creative Commons Attribution 3.0 Unported (CC BY 3.0)</a></p>
+
+                <h4>Savfk / Saverio Blasi</h4>
+                <p>“The Grid”</p>
+                <p><a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">Creative Commons Attribution 4.0 International (CC BY 4.0)</a></p>
+
+                <h3>© 2026 George Sánchez</h3>
+                <h4>“Las aventuras de Jesús”</h4>
+                <p>Todos los derechos reservados sobre los elementos originales del videojuego.</p>
+                <p>Las composiciones musicales y demás recursos de terceros identificados en estos créditos permanecen bajo la propiedad de sus respectivos autores y se utilizan conforme a las licencias indicadas.</p>
+                <p>La utilización de estas obras no implica patrocinio, asociación ni respaldo del videojuego por parte de los respectivos compositores.</p>
+              </section>
+            </div>
+            <button class="story-button" id="finish-level" type="button">Menú principal</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="controls-panel" aria-label="Controles táctiles">
+      <div class="touch-controls">
+        <div class="touch-group">
+          <button type="button" data-control="left" aria-label="Mover a la izquierda">◀</button>
+          <button type="button" data-control="right" aria-label="Mover a la derecha">▶</button>
+        </div>
+        <div class="touch-group action-group">
+          <button type="button" class="crouch-control" data-control="crouch">Agachar</button>
+          <button type="button" class="jump-control" data-control="jump">Saltar</button>
+          <button type="button" class="run-control" data-control="run">Correr</button>
+          <button type="button" class="light-control" data-control="light">Acción</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <audio id="level-music" src="audio-nivel-10.mp3" preload="auto" loop></audio>
+  <audio id="final-floor-music" src="audio-memoryofstone-final.mp3" preload="auto" loop></audio>
+  <audio id="credits-music" src="audio-creditos-final.mp3" preload="auto" loop></audio>
+  <script src="game.js?v=20260807-2"></script>
+</body>
+</html>

@@ -1,0 +1,3607 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nivel 9 - Camino al Calvario</title>
+  <style>
+    :root {
+      --gold: #ffd76a;
+      --deep: #2b1a10;
+      --wood: #6b3518;
+      --paper: #ffe7b1;
+      --green: #6ee338;
+      --red: #d94b3f;
+      --blue: #246aa5;
+      --stone: #5f5b55;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow: hidden;
+      color: #2a170d;
+      font-family: "Trebuchet MS", Arial, sans-serif;
+      background: #2b1b12;
+    }
+
+    @media (orientation: landscape) and (max-height: 619px) {
+      body {
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+    }
+
+    button {
+      font: inherit;
+      cursor: pointer;
+      border: 0;
+    }
+
+    .game {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      min-height: 620px;
+      background:
+        linear-gradient(180deg, rgba(52, 32, 18, .04), rgba(31, 19, 12, .22)),
+        url("assets/camino-nivel-9.png") center / 100% 100% no-repeat;
+      isolation: isolate;
+    }
+
+    .shade {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(36, 21, 12, .28), transparent 35%, rgba(36, 21, 12, .1));
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .hud-mask {
+      position: absolute;
+      left: 10px;
+      top: 4px;
+      width: 340px;
+      height: 154px;
+      border-radius: 10px;
+      background: linear-gradient(#6e3618, #4a230e);
+      box-shadow: 0 10px 0 rgba(0, 0, 0, .16);
+      pointer-events: none;
+      z-index: 7;
+    }
+
+    .hud {
+      position: absolute;
+      left: 16px;
+      top: 6px;
+      width: 324px;
+      min-width: 0;
+      min-height: 132px;
+      padding: 13px 14px 12px;
+      border: 4px solid #2a160b;
+      border-radius: 8px;
+      background: linear-gradient(#85451f, #54280f);
+      box-shadow: 0 8px 0 rgba(0, 0, 0, .28), inset 0 2px rgba(255,255,255,.18);
+      z-index: 8;
+    }
+
+    .hud-title {
+      color: #fff6d3;
+      font-size: clamp(20px, 1.8vw, 27px);
+      font-weight: 900;
+      text-shadow: 0 3px #2c1508;
+      margin-bottom: 5px;
+    }
+
+    .res-row {
+      display: grid;
+      grid-template-columns: 46px 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .heart {
+      width: 46px;
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      color: #e92931;
+      font-size: 42px;
+      line-height: 1;
+      filter: drop-shadow(0 4px 0 #3b0c0d);
+    }
+
+    .bar {
+      position: relative;
+      height: 42px;
+      border: 4px solid #241107;
+      border-radius: 13px;
+      background: #2d1b10;
+      overflow: hidden;
+      box-shadow: inset 0 4px 8px rgba(0,0,0,.45);
+    }
+
+    .bar-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(#b9ff4f 0%, #71df20 48%, #42ad15 100%);
+      transition: width .35s ease, background .35s ease;
+    }
+
+    .bar-text {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: white;
+      font-size: clamp(20px, 2vw, 30px);
+      font-weight: 900;
+      text-shadow: 0 3px 0 #151515, 2px 0 0 #151515, -2px 0 0 #151515;
+    }
+
+    .title-plaque {
+      position: absolute;
+      display: none;
+      top: clamp(10px, 3vh, 28px);
+      left: 50%;
+      transform: translateX(-50%);
+      min-width: min(660px, 52vw);
+      text-align: center;
+      padding: 14px 34px 18px;
+      border: 5px solid #3a1d0d;
+      border-radius: 8px;
+      color: #321704;
+      background: linear-gradient(#ffe9ba, #e0a84f);
+      box-shadow: 0 8px 0 rgba(0,0,0,.28), inset 0 0 0 3px rgba(255,255,255,.28);
+      z-index: 3;
+    }
+
+    .level-tag {
+      position: absolute;
+      left: 50%;
+      top: -28px;
+      transform: translateX(-50%);
+      min-width: 180px;
+      padding: 4px 18px 8px;
+      border: 4px solid #12375b;
+      border-radius: 10px;
+      color: white;
+      background: linear-gradient(#4f8ed1, #1f578c);
+      font-size: 28px;
+      font-weight: 900;
+      text-shadow: 0 3px #0e2b45;
+    }
+
+    .title-plaque h1 {
+      margin: 14px 0 0;
+      font-size: clamp(34px, 4vw, 58px);
+      letter-spacing: 0;
+      line-height: 1;
+    }
+
+    .map-node {
+      position: absolute;
+      width: clamp(58px, 5.5vw, 82px);
+      height: clamp(58px, 5.5vw, 82px);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: transparent;
+      font-weight: 900;
+      font-size: clamp(24px, 3vw, 42px);
+      text-shadow: none;
+      border: 4px solid transparent;
+      background: transparent;
+      box-shadow: none;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+    }
+
+    .map-node.current {
+      border-color: var(--gold);
+      background: rgba(255, 229, 118, .12);
+      box-shadow: 0 0 22px 12px rgba(255, 214, 93, .52), inset 0 0 12px rgba(255,255,255,.35);
+    }
+
+    .map-node.done {
+      border-color: rgba(144, 241, 120, .9);
+      background: rgba(96, 204, 79, .16);
+      box-shadow: 0 0 18px rgba(224,255,178,.75), inset 0 0 12px rgba(255,255,255,.25);
+    }
+
+    .map-node.locked { opacity: .2; }
+
+    .jesus-token {
+      position: absolute;
+      width: clamp(64px, 6.4vw, 90px);
+      height: clamp(64px, 6.4vw, 90px);
+      padding: 4px;
+      border: 4px solid var(--gold);
+      border-radius: 50%;
+      object-fit: cover;
+      object-position: 50% 50%;
+      background: linear-gradient(#fff1c3, #d99b48);
+      transform: translate(-50%, -86%);
+      transition: left .8s ease, top .8s ease;
+      z-index: 5;
+      box-shadow: 0 0 18px rgba(255, 221, 113, .75), 0 7px 5px rgba(0,0,0,.35);
+      pointer-events: none;
+    }
+
+    .start-panel {
+      position: absolute;
+      left: 24px;
+      top: 43%;
+      bottom: auto;
+      transform: none;
+      width: min(390px, calc(100vw - 48px));
+      padding: 12px 16px;
+      border: 5px solid #8f4a19;
+      border-radius: 8px;
+      color: #391c09;
+      text-align: center;
+      background: linear-gradient(#fff0c9, #f1bd69);
+      box-shadow: 0 7px 0 rgba(0,0,0,.25);
+      z-index: 6;
+    }
+
+    .start-panel p {
+      margin: 0 0 12px;
+      font-size: clamp(16px, 1.55vw, 21px);
+      font-weight: 800;
+      line-height: 1.15;
+    }
+
+    .primary-btn, .secondary-btn {
+      min-height: 46px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 900;
+      color: white;
+      background: linear-gradient(#3c9adc, #1f5f99);
+      box-shadow: 0 5px 0 #12375b;
+      text-shadow: 0 2px #12375b;
+    }
+
+    .secondary-btn {
+      background: linear-gradient(#8b6a49, #5d3b20);
+      box-shadow: 0 5px 0 #2e1a0d;
+    }
+
+    .screen {
+      position: absolute;
+      inset: 0;
+      display: none;
+      z-index: 10;
+      padding: clamp(12px, 2vw, 26px);
+      background:
+        radial-gradient(circle at 70% 15%, rgba(255, 219, 125, .28), transparent 30%),
+        linear-gradient(180deg, rgba(65, 41, 25, .92), rgba(30, 18, 12, .96));
+    }
+
+    .screen.active {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 14px;
+    }
+
+    .challenge-header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      color: #fff6dc;
+      text-shadow: 0 2px #1b0d06;
+    }
+
+    .challenge-header h2 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.05;
+    }
+
+    .challenge-header p {
+      margin: 6px 0 0;
+      max-width: 940px;
+      font-size: clamp(16px, 1.9vw, 22px);
+      color: #ffe7b7;
+    }
+
+    .screen.moment-seven {
+      padding-top: 10px;
+      gap: 8px;
+    }
+
+    .screen.moment-seven .challenge-header h2 {
+      font-size: clamp(22px, 3vw, 36px);
+      line-height: 1;
+    }
+
+    .screen.moment-seven .challenge-header p {
+      display: none;
+    }
+
+    .game-controls {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(120px, 1fr));
+      gap: 10px;
+      align-items: center;
+    }
+
+    .game-controls button {
+      min-height: 48px;
+    }
+
+    .mini {
+      position: relative;
+      overflow: hidden;
+      border: 5px solid #2a160b;
+      border-radius: 8px;
+      background:
+        linear-gradient(rgba(255, 232, 178, .92), rgba(231, 177, 100, .94)),
+        url("assets/camino-nivel-9.png") center / cover no-repeat;
+      box-shadow: inset 0 0 0 3px rgba(255,255,255,.18), 0 9px 0 rgba(0,0,0,.25);
+    }
+
+    .mini-inner {
+      position: absolute;
+      inset: 18px;
+      display: grid;
+      place-items: center;
+      gap: 16px;
+      text-align: center;
+    }
+
+    .mini-inner.godot-mode {
+      inset: 0;
+      display: block;
+      overflow: hidden;
+      background: #17120e;
+    }
+
+    .godot-tramo2-frame {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: #17120e;
+    }
+
+    .godot-loading-shell {
+      position: absolute;
+      z-index: 3;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      color: #fff1c8;
+      background: radial-gradient(circle at 50% 42%, #3a2a55 0, #17120e 68%);
+      text-align: center;
+      transition: opacity .35s ease, visibility .35s ease;
+    }
+
+    .godot-loading-shell.is-ready {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .godot-loading-card {
+      width: min(90%, 520px);
+      padding: 22px;
+      border: 3px solid #f0bd4d;
+      border-radius: 18px;
+      background: rgba(24, 15, 29, .88);
+      box-shadow: 0 14px 38px rgba(0, 0, 0, .42);
+    }
+
+    .godot-loading-card strong { display: block; margin-bottom: 8px; font-size: clamp(20px, 3vw, 30px); }
+    .godot-loading-card p { margin: 6px 0 14px; font-size: clamp(14px, 2vw, 18px); }
+    .godot-loading-card progress { width: 100%; height: 18px; accent-color: #4fc3f7; }
+
+    .mobile-landscape-hint {
+      display: none;
+    }
+
+    .prompt {
+      align-self: start;
+      justify-self: center;
+      padding: 9px 16px;
+      border: 3px solid #633215;
+      border-radius: 8px;
+      color: #3d1b08;
+      background: rgba(255, 238, 195, .92);
+      font-size: clamp(16px, 2vw, 23px);
+      font-weight: 900;
+      box-shadow: 0 4px 0 rgba(0,0,0,.2);
+    }
+
+    .round-info {
+      color: white;
+      font-size: clamp(18px, 2.2vw, 28px);
+      font-weight: 900;
+      text-shadow: 0 3px #2b1608;
+    }
+
+    .precision-level-indicator {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-height: 58px;
+      padding: 5px 16px;
+      color: #fff4c9;
+      border: 3px solid #4b270f;
+      border-radius: 999px;
+      background: linear-gradient(#8a4b24, #5b2d13);
+      box-shadow: 0 5px 0 rgba(39, 20, 8, .42);
+      font-weight: 900;
+      text-shadow: 0 2px #2b1608;
+    }
+
+    .precision-level-indicator strong {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      color: #274d68;
+      border: 3px solid #f1bd51;
+      border-radius: 50%;
+      background: #fff3bf;
+      font-size: 30px;
+      line-height: 1;
+      text-shadow: none;
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,.65);
+    }
+
+    .precision-level-indicator small {
+      color: #ffd66c;
+      font-size: 15px;
+    }
+
+    .precision-track {
+      position: relative;
+      width: min(760px, 86vw);
+      height: 72px;
+      border: 5px solid #2f170a;
+      border-radius: 8px;
+      background: linear-gradient(90deg, #be4e3d, #f0ca5b 35%, #74d64f 45%, #74d64f 55%, #f0ca5b 65%, #be4e3d);
+      box-shadow: inset 0 5px rgba(255,255,255,.22), 0 7px 0 rgba(0,0,0,.28);
+    }
+
+    .precision-track.advanced {
+      background: linear-gradient(90deg,
+        #bf4d3d 0 12%, #78db55 12% 18%, #bf4d3d 18% 36%,
+        #78db55 36% 42%, #bf4d3d 42% 58%, #78db55 58% 64%,
+        #bf4d3d 64% 82%, #78db55 82% 88%, #bf4d3d 88% 100%);
+    }
+
+    .marker {
+      position: absolute;
+      top: -16px;
+      left: 50%;
+      width: 14px;
+      height: 94px;
+      border-radius: 7px;
+      background: white;
+      border: 3px solid #1a1009;
+      box-shadow: 0 0 15px rgba(255,255,255,.85);
+      transform: translateX(-50%);
+    }
+
+    .precision-wrap {
+      position: relative;
+      display: grid;
+      gap: 18px;
+      justify-items: center;
+      padding-top: 72px;
+    }
+
+    .precision-jesus {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: clamp(82px, 9vw, 126px);
+      border-radius: 0;
+      mix-blend-mode: multiply;
+      filter: drop-shadow(0 7px 4px rgba(0,0,0,.35)) contrast(1.08) saturate(1.05);
+      background: transparent;
+    }
+
+    .balance-stage {
+      width: min(760px, 88vw);
+      height: min(410px, 52vh);
+      display: grid;
+      place-items: center;
+      border-bottom: 12px solid rgba(72, 43, 20, .45);
+    }
+
+    .safe-zone {
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      border-left: 5px dashed rgba(60, 146, 60, .8);
+      border-right: 5px dashed rgba(60, 146, 60, .8);
+      pointer-events: none;
+    }
+
+    .cross-balance {
+      width: 290px;
+      height: 210px;
+      position: relative;
+      transform-origin: 50% 62%;
+      transition: transform .08s linear;
+    }
+
+    .cross-balance::before,
+    .cross-balance::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      border: 4px solid #351706;
+      border-radius: 8px;
+      background: linear-gradient(90deg, #7d3c15, #b86727, #6c310f);
+      box-shadow: inset 0 4px rgba(255,255,255,.12), 0 6px 0 rgba(0,0,0,.22);
+    }
+
+    .cross-balance::before {
+      width: 72px;
+      height: 250px;
+      transform: translate(-50%, -50%) rotate(-18deg);
+    }
+
+    .cross-balance::after {
+      width: 280px;
+      height: 58px;
+      transform: translate(-50%, -62%) rotate(-18deg);
+    }
+
+    .pulse-wrap {
+      display: grid;
+      place-items: center;
+      gap: 16px;
+    }
+
+    .pulse-circle {
+      width: min(230px, 42vw);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      border: 8px solid #2d1609;
+      background: radial-gradient(circle, #fff7ca 0 27%, #7ed9ff 28% 42%, #225d8e 43% 100%);
+      box-shadow: 0 0 35px rgba(255,245,184,.65), inset 0 0 0 8px rgba(255,255,255,.25);
+      transform: scale(.78);
+      transition: transform .12s linear, filter .12s linear;
+    }
+
+    .pulse-circle.ready {
+      transform: scale(1.05);
+      filter: brightness(1.22);
+    }
+
+    .rollance-stage {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 18%, rgba(255,238,165,.55), transparent 23%),
+        linear-gradient(#bcecff, #f7cf85 43%, #5f3d24 44%, #2f1d12);
+      perspective: 760px;
+    }
+
+    .rollance-path {
+      position: absolute;
+      left: 50%;
+      bottom: -18%;
+      width: min(560px, 72vw);
+      height: 118%;
+      transform: translateX(-50%) rotateX(62deg);
+      transform-origin: bottom center;
+      background:
+        linear-gradient(90deg, transparent 0 31%, rgba(255,255,255,.18) 31% 32%, transparent 32% 68%, rgba(255,255,255,.18) 68% 69%, transparent 69%),
+        repeating-linear-gradient(180deg, #b78a58 0 64px, #9d7145 64px 128px);
+      border-left: 8px solid #503015;
+      border-right: 8px solid #503015;
+      box-shadow: 0 16px 0 rgba(0,0,0,.18);
+    }
+
+    .rollance-edge {
+      position: absolute;
+      left: 50%;
+      bottom: -18%;
+      width: min(560px, 72vw);
+      height: 118%;
+      transform: translateX(-50%) rotateX(62deg);
+      transform-origin: bottom center;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .rollance-edge::before,
+    .rollance-edge::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 10px;
+      border-radius: 8px;
+      background: linear-gradient(#70461f, #2d1a0d);
+      box-shadow: 0 0 10px rgba(0,0,0,.28);
+    }
+
+    .rollance-edge::before { left: 6%; }
+    .rollance-edge::after { right: 6%; }
+
+    .rollance-goal {
+      position: absolute;
+      left: 50%;
+      top: 70px;
+      transform: translateX(-50%);
+      padding: 8px 20px;
+      border: 4px solid #2a160b;
+      border-radius: 8px;
+      color: #2a160b;
+      background: linear-gradient(#fff7c8, #ffd76a);
+      font-weight: 900;
+      z-index: 3;
+      box-shadow: 0 5px 0 rgba(0,0,0,.25);
+    }
+
+    .rollance-ball {
+      position: absolute;
+      left: 50%;
+      bottom: 16%;
+      width: clamp(82px, 9vw, 122px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      border: 5px solid #fff0a8;
+      object-fit: cover;
+      background: #f5e4c1;
+      box-shadow: 0 0 18px rgba(255,230,118,.7), 0 9px 6px rgba(0,0,0,.35);
+      transition: transform .1s linear;
+      z-index: 2;
+    }
+
+    .rollance-hazard, .rollance-gem {
+      position: absolute;
+      left: 50%;
+      transform: translate(-50%, 0);
+      z-index: 1;
+    }
+
+    .rollance-hazard {
+      width: clamp(62px, 7vw, 92px);
+      height: clamp(42px, 5vw, 66px);
+      border: 4px solid #2d180c;
+      border-radius: 48% 42% 45% 38%;
+      background: radial-gradient(circle at 35% 25%, #9f988c, #5d574f 70%);
+      box-shadow: 0 7px 0 rgba(0,0,0,.26);
+    }
+
+    .rollance-gem {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fff6a8, #70dbff 38%, #2b77d0);
+      border: 3px solid #fff8c8;
+      box-shadow: 0 0 16px #dffcff;
+    }
+
+    .loop-game {
+      width: min(780px, 92vw);
+      height: min(500px, 62vh);
+      position: relative;
+      border: 5px solid #2a160b;
+      border-radius: 8px;
+      background: radial-gradient(circle at 50% 20%, #37537d, #12283b 48%, #0a1722);
+      overflow: hidden;
+      box-shadow: inset 0 0 45px rgba(255,255,255,.12);
+    }
+
+    .loop-path {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .loop-line {
+      stroke: rgba(255,255,255,.45);
+      stroke-width: 8;
+      stroke-linecap: round;
+      fill: none;
+    }
+
+    .loop-line.on {
+      stroke: #8eeaff;
+      filter: drop-shadow(0 0 8px #8eeaff);
+    }
+
+    .loop-node {
+      position: absolute;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      border: 4px solid #dff7ff;
+      background: #203e5e;
+      color: white;
+      font-weight: 900;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 16px rgba(142,234,255,.55);
+      z-index: 2;
+    }
+
+    .loop-node.active {
+      background: #0ca7d6;
+      box-shadow: 0 0 24px #9ff4ff;
+    }
+
+    .loop-node.goal {
+      background: #c93644;
+      border-color: #ffe2e2;
+      font-size: 24px;
+    }
+
+    .energy-board {
+      width: min(560px, 86vw);
+      aspect-ratio: 1;
+      display: grid;
+      gap: 8px;
+      padding: 12px;
+      border: 5px solid #2a160b;
+      border-radius: 8px;
+      background: radial-gradient(circle at 50% 35%, #294e73, #10233a 70%);
+      box-shadow: inset 0 0 42px rgba(142,234,255,.18), 0 8px 0 rgba(0,0,0,.25);
+    }
+
+    .energy-tile {
+      position: relative;
+      border: 3px solid rgba(213,244,255,.75);
+      border-radius: 12px;
+      background: rgba(11,30,48,.88);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-size: clamp(24px, 4vw, 38px);
+      font-weight: 900;
+      box-shadow: inset 0 0 16px rgba(255,255,255,.1);
+      overflow: hidden;
+    }
+
+    .energy-tile::before,
+    .energy-tile::after {
+      content: "";
+      position: absolute;
+      background: rgba(230, 250, 255, .5);
+      transition: background .18s ease, box-shadow .18s ease;
+    }
+
+    .energy-tile::before {
+      width: 18%;
+      height: 100%;
+      left: 41%;
+      top: 0;
+      transform: rotate(var(--rot, 0deg));
+    }
+
+    .energy-tile::after {
+      width: 100%;
+      height: 18%;
+      left: 0;
+      top: 41%;
+      transform: rotate(var(--rot, 0deg));
+      display: var(--elbow, none);
+    }
+
+    .energy-tile.powered {
+      border-color: #8eeaff;
+      box-shadow: 0 0 18px rgba(142,234,255,.75), inset 0 0 18px rgba(142,234,255,.22);
+    }
+
+    .energy-tile.powered::before,
+    .energy-tile.powered::after {
+      background: #8eeaff;
+      box-shadow: 0 0 12px #8eeaff;
+    }
+
+    .energy-tile.heart.powered {
+      background: radial-gradient(circle, #ffe0e8, #e13f58);
+      color: white;
+      box-shadow: 0 0 28px rgba(255,118,148,.85);
+    }
+
+    .runner {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(#ffd07e, #f7b15e 42%, #9b6634 43%, #70431f);
+      overflow: hidden;
+    }
+
+    .runner-road {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 34%;
+      background: linear-gradient(#a97944, #68401f);
+      border-top: 6px solid #543217;
+    }
+
+    .runner-jesus {
+      position: absolute;
+      left: 10%;
+      bottom: 24%;
+      width: clamp(84px, 10vw, 138px);
+      transition: transform .12s ease;
+      filter: drop-shadow(0 7px 4px rgba(0,0,0,.35));
+      z-index: 2;
+      will-change: bottom;
+    }
+
+    .runner-jesus.crouch {
+      transform: scaleY(.72);
+      transform-origin: bottom;
+    }
+
+    .obstacle {
+      position: absolute;
+      right: -80px;
+      bottom: 34%;
+      width: 72px;
+      height: 54px;
+      border: 4px solid #2c170a;
+      border-radius: 8px;
+      background: #6d6254;
+      color: white;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      z-index: 1;
+    }
+
+    .obstacle.high {
+      bottom: 46%;
+      width: 122px;
+      height: 38px;
+      background: #7d3d16;
+    }
+
+    .obstacle.rock {
+      border-radius: 48% 42% 45% 38%;
+      background: radial-gradient(circle at 35% 25%, #9f988c, #5d574f 70%);
+    }
+
+    .obstacle.wood {
+      width: 118px;
+      height: 42px;
+      background: linear-gradient(90deg, #6f3514, #a95d22, #6b3212);
+    }
+
+    .obstacle.torch {
+      width: 44px;
+      height: 108px;
+      bottom: 34%;
+      background: linear-gradient(#ffcf4e 0 30%, #9b3b18 31% 44%, #5b2e12 45%);
+      border-radius: 18px 18px 8px 8px;
+    }
+
+    .sync-bars, .lanes {
+      width: min(760px, 88vw);
+      display: grid;
+      gap: 22px;
+    }
+
+    .sync-track {
+      position: relative;
+      height: 62px;
+      border: 4px solid #2b1609;
+      border-radius: 8px;
+      background: linear-gradient(90deg, #b95542, #e2c75b 38%, #7bde56 45% 55%, #e2c75b 62%, #b95542);
+      box-shadow: inset 0 4px rgba(255,255,255,.2);
+    }
+
+    .sync-label {
+      position: absolute;
+      left: 10px;
+      top: -34px;
+      color: white;
+      font-weight: 900;
+      font-size: 22px;
+      text-shadow: 0 2px #1f1008;
+    }
+
+    .sync-dot {
+      position: absolute;
+      top: 50%;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 4px solid #201008;
+      background: #fff4bd;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 16px rgba(255,255,255,.8);
+    }
+
+    .puzzle-wrap {
+      width: min(800px, 90vw);
+      height: 100%;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) minmax(260px, 1fr);
+      gap: 14px;
+      align-items: center;
+    }
+
+    .mini-inner:has(.puzzle-wrap) {
+      inset: 14px 18px 24px;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: 10px;
+    }
+
+    .puzzle-board {
+      --puzzle-cols: 2;
+      --puzzle-rows: 2;
+      width: clamp(250px, min(38vw, calc(100vh - 380px)), 410px);
+      max-height: 100%;
+      aspect-ratio: 1;
+      display: grid;
+      grid-template-columns: repeat(var(--puzzle-cols), minmax(0, 1fr));
+      grid-template-rows: repeat(var(--puzzle-rows), minmax(0, 1fr));
+      gap: 2px;
+      padding: 5px;
+      border: 3px solid #2a160b;
+      border-radius: 8px;
+      background: rgba(255,238,195,.94);
+      box-shadow: 0 8px 0 rgba(0,0,0,.25);
+    }
+
+    .puzzle-tile {
+      position: relative;
+      border: 1px solid rgba(107, 53, 24, .72);
+      border-radius: 4px;
+      background-repeat: no-repeat;
+      min-height: 0;
+      touch-action: none;
+      cursor: grab;
+      transition: opacity .15s ease, outline-color .15s ease, box-shadow .15s ease;
+    }
+
+    .puzzle-tile.dragging {
+      opacity: .34;
+      cursor: grabbing;
+    }
+
+    .puzzle-tile.drag-target {
+      outline: 3px solid #ffd76a;
+      outline-offset: -3px;
+      box-shadow: inset 0 0 18px rgba(255, 215, 106, .85);
+    }
+
+    .puzzle-tile.correct {
+      box-shadow: inset 0 0 0 2px rgba(76, 158, 72, .72);
+    }
+
+    .puzzle-drag-ghost {
+      position: fixed;
+      z-index: 9999;
+      margin: 0;
+      pointer-events: none;
+      opacity: .92;
+      transform: translate(-50%, -50%) scale(1.06);
+      box-shadow: 0 12px 24px rgba(28, 15, 7, .42);
+      cursor: grabbing;
+    }
+
+    .puzzle-side {
+      display: grid;
+      gap: 8px;
+      justify-items: center;
+      color: #fff5d6;
+      text-align: center;
+      font-size: clamp(18px, 2vw, 25px);
+      font-weight: 900;
+      text-shadow: 0 3px #2b1608;
+    }
+
+    .puzzle-preview {
+      max-width: min(270px, 32vw);
+      max-height: min(250px, calc(100vh - 500px));
+      border: 5px solid #2a160b;
+      border-radius: 8px;
+      background: #fff0c8;
+      object-fit: contain;
+      box-shadow: 0 8px 0 rgba(0,0,0,.25);
+    }
+
+    .molecule-wrap {
+      width: min(1060px, 94vw);
+      display: grid;
+      grid-template-columns: minmax(320px, 1fr) minmax(240px, 320px);
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .molecule-stage {
+      position: relative;
+      min-height: min(560px, 64vh);
+      border: 5px solid #2a160b;
+      border-radius: 8px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 42%, rgba(118, 197, 255, .22), transparent 38%),
+        linear-gradient(180deg, #18243b, #2a1830 54%, #130e18);
+      box-shadow: inset 0 0 50px rgba(255,255,255,.12), 0 8px 0 rgba(0,0,0,.25);
+    }
+
+    .molecule-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .mol-bond {
+      stroke-width: 7;
+      stroke-linecap: round;
+      cursor: pointer;
+      opacity: .95;
+    }
+
+    .mol-bond.normal { stroke: #a9adb5; }
+    .mol-bond.dark { stroke: #9c2245; filter: drop-shadow(0 0 5px #c03561); }
+    .mol-bond.light { stroke: #ffd76a; filter: drop-shadow(0 0 8px #fff0a8); }
+    .mol-bond.cut {
+      opacity: .18;
+      stroke-dasharray: 8 10;
+      pointer-events: none;
+    }
+
+    .mol-bond.reaction-preview {
+      stroke: #ff9d42;
+      stroke-dasharray: 9 7;
+      filter: drop-shadow(0 0 7px #ffba61);
+      animation: reactionBondPulse .72s ease-in-out infinite alternate;
+    }
+
+    .mol-atom {
+      position: absolute;
+      width: clamp(58px, 6.2vw, 78px);
+      height: clamp(58px, 6.2vw, 78px);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      border: 5px solid rgba(255,255,255,.72);
+      color: white;
+      font-size: clamp(22px, 3vw, 34px);
+      font-weight: 900;
+      text-shadow: 0 3px 0 rgba(0,0,0,.45);
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+      z-index: 2;
+      box-shadow: 0 7px 0 rgba(0,0,0,.28), inset 0 5px rgba(255,255,255,.16);
+    }
+
+    .mol-atom.good {
+      color: #2b1707;
+      background: radial-gradient(circle at 35% 25%, #fff9d6, #ffd76a 55%, #7edcff);
+      box-shadow: 0 0 24px rgba(255,235,136,.85), 0 7px 0 rgba(0,0,0,.28);
+    }
+
+    .mol-atom.bad {
+      background: radial-gradient(circle at 35% 25%, #7f3147, #4a1327 62%, #1a0b16);
+    }
+
+    .mol-atom.neutral {
+      background: radial-gradient(circle at 35% 25%, #b69c78, #6e5940 68%, #322519);
+    }
+
+    .molecule-stage.dense-network .mol-atom {
+      width: clamp(42px, 5vw, 62px);
+      height: clamp(42px, 5vw, 62px);
+      border-width: 4px;
+      font-size: clamp(14px, 1.8vw, 23px);
+    }
+
+    .mol-atom.destroyed {
+      opacity: .15;
+      transform: translate(-50%, -50%) scale(.76);
+      pointer-events: none;
+    }
+
+    .mol-atom.reaction-preview {
+      outline: 5px solid #ffb24e;
+      outline-offset: 3px;
+      animation: reactionNodePulse .72s ease-in-out infinite alternate;
+    }
+
+    .mol-atom.reaction-origin {
+      outline-color: #fff3a2;
+      box-shadow: 0 0 18px #fff, 0 0 34px #ffb43c;
+    }
+
+    .mol-atom.removing {
+      animation: reactionRemove .34s ease-in forwards;
+      pointer-events: none;
+    }
+
+    .molecule-actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    @keyframes reactionNodePulse {
+      to { filter: brightness(1.25); transform: translate(-50%, -50%) scale(1.08); }
+    }
+
+    @keyframes reactionBondPulse {
+      to { opacity: .48; }
+    }
+
+    @keyframes reactionRemove {
+      to { opacity: 0; transform: translate(-50%, -50%) scale(.2) rotate(18deg); }
+    }
+
+    .molecule-flash {
+      position: absolute;
+      inset: 0;
+      display: none;
+      place-items: center;
+      text-align: center;
+      padding: 24px;
+      color: #fff7c7;
+      font-size: clamp(24px, 3.5vw, 42px);
+      font-weight: 900;
+      text-shadow: 0 3px 0 #2b1608;
+      background: radial-gradient(circle, rgba(255,235,126,.42), rgba(255,255,255,.12) 32%, rgba(20,13,18,.72));
+      z-index: 5;
+    }
+
+    .molecule-flash.show { display: grid; }
+
+    .molecule-legend {
+      display: grid;
+      gap: 10px;
+      align-content: start;
+      padding: 14px;
+      border: 5px solid #2a160b;
+      border-radius: 8px;
+      color: #fff5d6;
+      background: linear-gradient(#5a321b, #2d190e);
+      box-shadow: 0 8px 0 rgba(0,0,0,.25);
+    }
+
+    .molecule-legend h3 {
+      margin: 0;
+      color: #fff0b6;
+      font-size: clamp(20px, 2vw, 26px);
+    }
+
+    .legend-group {
+      display: grid;
+      gap: 5px;
+      font-size: clamp(13px, 1.35vw, 16px);
+      line-height: 1.2;
+    }
+
+    .legend-group strong { color: #ffd76a; }
+
+    .lanes {
+      grid-template-columns: repeat(4, 1fr);
+      height: min(500px, 62vh);
+      align-self: end;
+      gap: 8px;
+    }
+
+    .lane {
+      position: relative;
+      overflow: hidden;
+      border: 4px solid #2b1609;
+      border-radius: 8px;
+      background: rgba(64, 35, 18, .48);
+    }
+
+    .lane-key {
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      bottom: 16px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      border: 4px solid #ffe7a8;
+      border-radius: 8px;
+      color: #fff7ca;
+      font-size: 34px;
+      font-weight: 900;
+      background: rgba(24, 13, 8, .48);
+      cursor: pointer;
+      user-select: none;
+      touch-action: manipulation;
+      transition: background .15s ease, transform .15s ease, box-shadow .15s ease;
+    }
+
+    .word {
+      position: absolute;
+      left: 7px;
+      right: 7px;
+      top: -56px;
+      min-height: 44px;
+      display: grid;
+      place-items: center;
+      border: 3px solid #2b1609;
+      border-radius: 8px;
+      font-size: clamp(13px, 1.5vw, 20px);
+      font-weight: 900;
+      color: #271307;
+      background: #fff0b6;
+      box-shadow: 0 4px 0 rgba(0,0,0,.25);
+    }
+
+    .word.bad {
+      color: white;
+      background: #8c4545;
+    }
+
+    .word.good-hit {
+      z-index: 5;
+      animation: goodWordFlash .42s ease-out forwards;
+    }
+
+    .word.bad-hit {
+      z-index: 5;
+      animation: badWordFade .38s ease-out forwards;
+    }
+
+    .lane-key.bad-press {
+      animation: badKeyFlash .48s ease-out;
+    }
+
+    .words-intro {
+      width: min(680px, 90vw);
+      display: grid;
+      justify-items: center;
+      gap: 16px;
+      padding: clamp(20px, 4vw, 36px);
+      border: 5px solid #542a12;
+      border-radius: 20px;
+      color: #3c210e;
+      background: linear-gradient(#fff4cc, #efc774);
+      box-shadow: 0 10px 0 rgba(44, 23, 8, .34), inset 0 0 0 3px rgba(255,255,255,.46);
+      text-align: center;
+    }
+
+    .words-intro h2 {
+      margin: 0;
+      color: #245c72;
+      font-size: clamp(28px, 4vw, 42px);
+    }
+
+    .words-intro p {
+      margin: 0;
+      max-width: 590px;
+      font-size: clamp(16px, 2vw, 22px);
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .word-examples,
+    .arrow-guide {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 9px;
+    }
+
+    .word-example {
+      padding: 7px 12px;
+      border: 2px solid #573018;
+      border-radius: 999px;
+      background: #fff2b6;
+      font-weight: 900;
+    }
+
+    .word-example.bad { color: white; background: #934343; }
+
+    .arrow-guide span {
+      display: grid;
+      place-items: center;
+      width: 48px;
+      height: 42px;
+      border: 3px solid #ffe5a0;
+      border-radius: 8px;
+      color: #fff7ca;
+      background: #533019;
+      font-size: 25px;
+      font-weight: 900;
+    }
+
+    @keyframes goodWordFlash {
+      0% { transform: scale(1); background: #fff0b6; box-shadow: 0 4px 0 rgba(0,0,0,.25); }
+      45% { transform: scale(1.16); color: #174f33; background: #fffbd0; box-shadow: 0 0 12px #fff, 0 0 30px #ffe15c, 0 0 48px #8ff0a6; }
+      100% { transform: scale(.84); opacity: 0; box-shadow: 0 0 25px #ffe15c; }
+    }
+
+    @keyframes badWordFade {
+      45% { transform: scale(1.08); background: #c92f37; box-shadow: 0 0 24px #ff3e46; }
+      100% { transform: scale(.86); opacity: 0; }
+    }
+
+    @keyframes badKeyFlash {
+      0%, 100% { transform: scale(1); background: rgba(24, 13, 8, .48); }
+      35% { transform: scale(1.08); color: white; background: #c82431; box-shadow: 0 0 20px #ff3642, inset 0 0 12px #ff9c9c; }
+    }
+
+    .result-toast {
+      position: absolute;
+      left: 50%;
+      top: 74px;
+      transform: translateX(-50%);
+      min-width: min(560px, 86vw);
+      padding: 10px 16px;
+      border: 4px solid #2b1609;
+      border-radius: 8px;
+      color: #2b1609;
+      background: #fff2bd;
+      font-size: clamp(18px, 2.3vw, 28px);
+      font-weight: 900;
+      text-align: center;
+      opacity: 0;
+      z-index: 20;
+      transition: opacity .16s ease;
+      pointer-events: none;
+    }
+
+    .result-toast.show { opacity: 1; }
+
+    .modal {
+      position: absolute;
+      inset: 0;
+      display: none;
+      place-items: center;
+      padding: 20px;
+      background: rgba(30, 17, 10, .72);
+      z-index: 30;
+    }
+
+    .modal.show { display: grid; }
+
+    .modal-card {
+      width: min(650px, 94vw);
+      padding: 24px;
+      border: 5px solid #2b1609;
+      border-radius: 8px;
+      text-align: center;
+      background: linear-gradient(#fff3cd, #e7b46a);
+      box-shadow: 0 10px 0 rgba(0,0,0,.32);
+    }
+
+    .modal-card h3 {
+      margin: 0 0 10px;
+      font-size: clamp(26px, 3vw, 40px);
+    }
+
+    .modal-card p {
+      margin: 0 0 18px;
+      font-size: clamp(18px, 2vw, 24px);
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    @media (max-width: 760px) {
+      body { overflow: auto; }
+      .game { min-height: 760px; }
+      .title-plaque {
+        min-width: calc(100vw - 24px);
+        padding-inline: 16px;
+      }
+      .hud {
+        top: 8px;
+        width: min(300px, calc(100vw - 28px));
+        min-width: 0;
+      }
+      .hud-mask {
+        left: 8px;
+        top: 4px;
+        width: min(316px, calc(100vw - 16px));
+        height: 154px;
+      }
+      .map-node {
+        width: 42px;
+        height: 42px;
+      }
+      .jesus-token { width: 74px; }
+      .start-panel {
+        left: 12px;
+        top: 42%;
+        bottom: auto;
+        width: min(330px, calc(100vw - 24px));
+      }
+      .challenge-header {
+        grid-template-columns: 1fr;
+      }
+      .challenge-header .secondary-btn {
+        justify-self: start;
+      }
+      .mini-inner { inset: 10px; }
+      .lanes { height: 500px; }
+      .word { font-size: 12px; }
+      .game-controls {
+        grid-template-columns: 1fr;
+      }
+      .puzzle-wrap {
+        width: 100%;
+        grid-template-columns: minmax(0, 1fr) minmax(110px, .72fr);
+        gap: 8px;
+      }
+      .puzzle-board {
+        width: min(100%, 260px);
+      }
+      .puzzle-preview {
+        max-width: 100%;
+        max-height: 160px;
+      }
+      .puzzle-side {
+        gap: 5px;
+        font-size: 14px;
+      }
+      .mini-inner:has(.puzzle-wrap) {
+        inset: 8px 10px 18px;
+        gap: 6px;
+      }
+      .molecule-wrap {
+        grid-template-columns: 1fr;
+      }
+      .molecule-stage {
+        min-height: 430px;
+      }
+      .molecule-legend {
+        max-height: 210px;
+        overflow: auto;
+      }
+    }
+
+    @media (max-width: 760px) and (orientation: portrait) {
+      .mini-inner.godot-mode .mobile-landscape-hint {
+        position: absolute;
+        inset: 0;
+        z-index: 4;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        color: #fff4cc;
+        background: rgba(18, 18, 36, .94);
+        font-size: clamp(19px, 5.5vw, 25px);
+        font-weight: 900;
+        line-height: 1.3;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="game" id="game">
+    <div class="shade"></div>
+    <div class="hud-mask" aria-hidden="true"></div>
+
+    <section class="title-plaque" aria-label="Titulo del nivel">
+      <div class="level-tag">Nivel 9</div>
+      <h1>Camino al Calvario</h1>
+    </section>
+
+    <aside class="hud" aria-label="Resistencia">
+      <div class="hud-title">Resistencia</div>
+      <div class="res-row">
+        <div class="heart" aria-hidden="true">♥</div>
+        <div class="bar">
+          <div class="bar-fill" id="resFill"></div>
+          <div class="bar-text" id="resText">100%</div>
+        </div>
+      </div>
+    </aside>
+
+    <img class="jesus-token" id="jesusToken" src="assets/jesus-cruz.png" alt="Jesús cargando la cruz">
+
+    <section class="start-panel" id="startPanel">
+      <p id="mapMessage">Cada paso de resistencia nos acerca al plan de Dios.</p>
+      <button class="primary-btn" id="startBtn" type="button">Comenzar momento</button>
+    </section>
+
+    <section class="screen" id="challengeScreen" aria-live="polite">
+      <header class="challenge-header">
+        <div>
+          <h2 id="challengeTitle">Momento de resistencia</h2>
+          <p id="challengeText"></p>
+        </div>
+        <button class="secondary-btn" id="mapBtn" type="button">Volver al mapa</button>
+      </header>
+      <div class="mini" id="miniArea">
+        <div class="mini-inner" id="miniInner"></div>
+        <div class="result-toast" id="toast"></div>
+      </div>
+      <footer class="game-controls">
+        <button class="secondary-btn" id="bottomMapBtn" type="button">Mapa</button>
+        <button class="secondary-btn" id="restartMomentBtn" type="button">Reiniciar momento</button>
+        <button class="primary-btn" id="bottomActionBtn" type="button">Acción</button>
+      </footer>
+    </section>
+
+    <section class="modal" id="modal">
+      <div class="modal-card">
+        <h3 id="modalTitle">Recuperar fuerzas</h3>
+        <p id="modalText">Jesús necesita recuperar fuerzas. Intenta nuevamente este momento de resistencia.</p>
+        <button class="primary-btn" id="modalBtn" type="button">Intentar nuevamente</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const nodes = [
+      { x: 11, y: 86, title: "Primer agotamiento" },
+      { x: 25, y: 75, title: "Camino irregular" },
+      { x: 43, y: 76, title: "Respirar y continuar" },
+      { x: 52, y: 64, title: "Obstáculos en el camino" },
+      { x: 60, y: 52, title: "Ayuda de Simón de Cirene" },
+      { x: 73, y: 41, title: "Perdón ante la burla" },
+      { x: 73, y: 30, title: "Última subida al Gólgota" },
+      { x: 73, y: 19, title: "Llegada al Gólgota" }
+    ];
+
+    const moments = [
+      {
+        title: "Momento de resistencia 1: Primer agotamiento",
+        text: "Presiona Espacio, Flecha Abajo o el botón de acción cuando el marcador esté en la franja verde, que cambia de posición en cada nivel."
+      },
+      {
+        title: "Momento de resistencia 2: Camino irregular",
+        text: "Guía la esfera con Izquierda y Derecha hasta la meta, evitando huecos y conservando el equilibrio."
+      },
+      {
+        title: "Momento de resistencia 3: Energía de esperanza",
+        text: "Gira los senderos y lleva la energía desde la fuente hasta todas las lámparas en siete niveles."
+      },
+      {
+        title: "Momento de resistencia 4: Obstáculos en el camino",
+        text: "Salta con Arriba o Espacio los obstáculos bajos. Agáchate con Abajo ante ramas o maderos."
+      },
+      {
+        title: "Momento de resistencia 5: Ayuda de Simón de Cirene",
+        text: "Completa seis rompecabezas para representar la ayuda recibida en el camino."
+      },
+      {
+        title: "Momento de resistencia 6: Perdón ante la burla",
+        text: "Toma palabras buenas con la flecha correcta y evita las palabras negativas."
+      },
+      {
+        title: "Momento de resistencia 7: Última subida al Gólgota",
+        text: ""
+      }
+    ];
+
+    const LEVEL9_SAVE_KEY = "aventurasJesus.nivel9.v1";
+    const INTERNAL_ORIGIN = window.location.origin;
+    let savedLevel9 = null;
+    try { savedLevel9 = JSON.parse(localStorage.getItem(LEVEL9_SAVE_KEY) || "null"); } catch {}
+    const requestedMoment = Number(new URLSearchParams(location.search).get("qaMoment"));
+    const state = {
+      resistance: Math.max(0, Math.min(100, Number(savedLevel9?.resistance) || 100)),
+      current: Math.max(0, Math.min(7, Number.isFinite(requestedMoment) && requestedMoment > 0 ? requestedMoment : Number(savedLevel9?.current) || 0)),
+      completed: new Set(Array.isArray(savedLevel9?.completed) ? savedLevel9.completed : []),
+      activeCleanup: null,
+      locked: false
+    };
+
+    function saveLevel9Progress() {
+      localStorage.setItem(LEVEL9_SAVE_KEY, JSON.stringify({
+        resistance: state.resistance,
+        current: state.current,
+        completed: [...state.completed],
+        updatedAt: new Date().toISOString()
+      }));
+    }
+
+    window.__unifiedPaused = false;
+    window.addEventListener("message", (event) => {
+      if (event.origin !== INTERNAL_ORIGIN || event.source !== window.parent ||
+          !isMessageObject(event.data) ||
+          !hasOnlyMessageKeys(event.data, ["type", "paused"]) ||
+          event.data.type !== "unified-game-pause" || typeof event.data.paused !== "boolean") return;
+      window.__unifiedPaused = event.data.paused;
+      document.querySelectorAll("iframe").forEach((frame) => {
+        try { frame.contentWindow?.postMessage(event.data, INTERNAL_ORIGIN); } catch {}
+      });
+      try {
+        if (window.Module && window.__unifiedPaused && typeof Module.pauseMainLoop === "function") Module.pauseMainLoop();
+        if (window.Module && !window.__unifiedPaused && typeof Module.resumeMainLoop === "function") Module.resumeMainLoop();
+      } catch {}
+    });
+
+    function isMessageObject(data) {
+      return data !== null && typeof data === "object" && !Array.isArray(data);
+    }
+
+    function hasOnlyMessageKeys(data, allowedKeys) {
+      return Object.keys(data).every((key) => allowedKeys.includes(key));
+    }
+
+    const game = document.getElementById("game");
+    const resFill = document.getElementById("resFill");
+    const resText = document.getElementById("resText");
+    const jesusToken = document.getElementById("jesusToken");
+    const startPanel = document.getElementById("startPanel");
+    const mapMessage = document.getElementById("mapMessage");
+    const startBtn = document.getElementById("startBtn");
+    const screen = document.getElementById("challengeScreen");
+    const challengeTitle = document.getElementById("challengeTitle");
+    const challengeText = document.getElementById("challengeText");
+    const miniInner = document.getElementById("miniInner");
+    const miniArea = document.getElementById("miniArea");
+    const toast = document.getElementById("toast");
+    const modal = document.getElementById("modal");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalText = document.getElementById("modalText");
+    const modalBtn = document.getElementById("modalBtn");
+    const mapBtn = document.getElementById("mapBtn");
+    const bottomMapBtn = document.getElementById("bottomMapBtn");
+    const restartMomentBtn = document.getElementById("restartMomentBtn");
+    const bottomActionBtn = document.getElementById("bottomActionBtn");
+
+    function buildMap() {
+      nodes.forEach((node, index) => {
+        const el = document.createElement("button");
+        el.className = "map-node locked";
+        el.type = "button";
+        el.textContent = index + 1;
+        el.title = node.title;
+        el.style.left = node.x + "%";
+        el.style.top = node.y + "%";
+        el.addEventListener("click", () => {
+          if (index === state.current && state.current < 7) startMoment();
+        });
+        game.appendChild(el);
+        node.el = el;
+      });
+      updateMap();
+    }
+
+    function updateMap() {
+      saveLevel9Progress();
+      nodes.forEach((node, index) => {
+        node.el.classList.toggle("done", state.completed.has(index) || state.current === 7);
+        node.el.classList.toggle("current", index === state.current);
+        node.el.classList.toggle("locked", index > state.current);
+      });
+      const node = nodes[Math.min(state.current, 7)];
+      jesusToken.style.left = node.x + "%";
+      jesusToken.style.top = node.y + "%";
+      if (state.current < 7) {
+        mapMessage.textContent = nodes[state.current].title + ". Cada paso de resistencia nos acerca al plan de Dios.";
+        startBtn.textContent = "Comenzar momento " + (state.current + 1);
+        startBtn.style.display = "";
+      } else {
+        mapMessage.textContent = "Jesús llega al Gólgota con obediencia, amor y esperanza.";
+        startBtn.textContent = "Nivel completado";
+        startBtn.style.display = "none";
+        showFinal();
+      }
+    }
+
+    function preloadTramo2Resources() {
+      if (location.protocol === "file:" || document.getElementById("tramo2PreloadWasm")) return;
+      const resources = [
+        ["tramo2PreloadWasm", "tramo2/index.wasm", "application/wasm"],
+        ["tramo2PreloadPack", "tramo2/index.pck", "application/octet-stream"]
+      ];
+      resources.forEach(([id, href, type]) => {
+        const link = document.createElement("link");
+        link.id = id;
+        link.rel = "preload";
+        link.as = "fetch";
+        link.href = href;
+        link.type = type;
+        link.crossOrigin = "anonymous";
+        document.head.appendChild(link);
+      });
+    }
+
+    function updateResistance() {
+      saveLevel9Progress();
+      state.resistance = Math.max(0, Math.min(100, state.resistance));
+      resFill.style.width = state.resistance + "%";
+      resText.textContent = state.resistance + "%";
+      resFill.style.background = state.resistance <= 25
+        ? "linear-gradient(#ff9b69, #d94b3f)"
+        : "linear-gradient(#b9ff4f 0%, #71df20 48%, #42ad15 100%)";
+    }
+
+    function changeResistance(amount, label) {
+      state.resistance = Math.max(0, Math.min(100, state.resistance + amount));
+      updateResistance();
+      if (label) showToast(label);
+      if (state.resistance <= 0) {
+        setTimeout(showRetry, 350);
+        return false;
+      }
+      return true;
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove("show"), 900);
+    }
+
+    function setMini(html) {
+      miniInner.innerHTML = html;
+    }
+
+    function cleanup() {
+      if (state.activeCleanup) state.activeCleanup();
+      state.activeCleanup = null;
+      state.locked = false;
+      miniArea.className = "mini";
+    }
+
+    function startMoment() {
+      if (state.current >= 7) return;
+      cleanup();
+      const moment = moments[state.current];
+      screen.classList.toggle("moment-seven", state.current === 6);
+      challengeTitle.textContent = moment.title;
+      challengeText.textContent = moment.text;
+      screen.classList.add("active");
+      startPanel.style.display = "none";
+      const runners = [playPrecision, playBalanceGodot, playCircuitoEsperanza, playRunner, playSimon, playWords, playReactionGodot];
+      runners[state.current]();
+    }
+
+    function backToMap() {
+      cleanup();
+      screen.classList.remove("active");
+      startPanel.style.display = "";
+      updateMap();
+    }
+
+    function completeMoment(bonus = 5) {
+      if (state.locked) return;
+      state.locked = true;
+      cleanup();
+      state.completed.add(state.current);
+      if (bonus > 0) {
+        changeResistance(bonus, "Momento completado: +" + bonus + "% de resistencia");
+      } else {
+        showToast("Momento completado sin recompensa adicional");
+      }
+      setTimeout(() => {
+        screen.classList.remove("active");
+        startPanel.style.display = "";
+        state.current += 1;
+        updateMap();
+      }, 1050);
+    }
+
+    function showRetry() {
+      cleanup();
+      modalTitle.textContent = "Resistencia agotada";
+      modalText.textContent = "La resistencia llegó a 0%. El Nivel 9 se reiniciará desde el primer tramo con 50% de resistencia.";
+      modalBtn.textContent = "Reiniciar Nivel 9";
+      modal.classList.add("show");
+    }
+
+    function showFinal() {
+      saveLevel9Progress();
+      window.parent.postMessage({ type: "nivel9-completado", resistance: state.resistance }, INTERNAL_ORIGIN);
+      modalTitle.textContent = "Nivel 9 completado";
+      modalText.textContent = "Jesús llega al Gólgota. Su obediencia, paciencia, perdón y amor nos recuerdan la esperanza del plan de Dios.";
+      modal.classList.add("show");
+      modalBtn.textContent = "Ver mapa";
+    }
+
+    function retryCurrent() {
+      modal.classList.remove("show");
+      modalBtn.textContent = "Intentar nuevamente";
+      if (state.current >= 7) return;
+      state.current = 0;
+      state.completed.clear();
+      state.resistance = 50;
+      updateResistance();
+      updateMap();
+      startMoment();
+    }
+
+    function isActionKey(e) {
+      return e.code === "Space" || e.code === "Enter" || e.code === "ArrowDown" || e.key.toLowerCase() === "z";
+    }
+
+    function playPrecision() {
+      let round = 0;
+      let pos = 0;
+      let dir = 1;
+      let raf = 0;
+      const levels = [
+        { speed: 1.05, start: 12, end: 28 },
+        { speed: 1.30, start: 68, end: 84 },
+        { speed: 1.55, start: 38, end: 54 },
+        { speed: 1.85, start: 20, end: 34 },
+        { speed: 2.15, start: 58, end: 72 },
+        { speed: 2.50, start: 8, end: 20 },
+        { speed: 2.90, start: 76, end: 88 }
+      ];
+      setMini(`
+        <div class="precision-wrap">
+          <img class="precision-jesus" src="assets/jesus-cruz.png" alt="Jesús con la cruz">
+          <div class="precision-level-indicator" aria-live="polite">
+            <span>Nivel</span>
+            <strong class="precision-level-number">1</strong>
+            <small>de 7</small>
+          </div>
+          <div class="precision-track"><div class="marker"></div></div>
+          <button class="primary-btn action" type="button">Acción</button>
+          <div class="round-info">La franja verde cambia de posición en cada nivel.</div>
+        </div>
+      `);
+      const marker = miniInner.querySelector(".marker");
+      const track = miniInner.querySelector(".precision-track");
+      const levelNumber = miniInner.querySelector(".precision-level-number");
+      const action = miniInner.querySelector(".action");
+      function showLevel() {
+        const level = levels[round];
+        const yellowStart = Math.max(0, level.start - 8);
+        const yellowEnd = Math.min(100, level.end + 8);
+        track.style.background = `linear-gradient(90deg,
+          #be4e3d 0% ${yellowStart}%,
+          #f0ca5b ${yellowStart}% ${level.start}%,
+          #74d64f ${level.start}% ${level.end}%,
+          #f0ca5b ${level.end}% ${yellowEnd}%,
+          #be4e3d ${yellowEnd}% 100%)`;
+        track.setAttribute("aria-label", `Nivel ${round + 1}: zona verde entre ${level.start} y ${level.end} por ciento`);
+        levelNumber.textContent = round + 1;
+      }
+      function frame() {
+        if (window.__unifiedPaused) { raf = requestAnimationFrame(frame); return; }
+        pos += dir * levels[round].speed;
+        if (pos >= 100 || pos <= 0) {
+          dir *= -1;
+          pos = Math.max(0, Math.min(100, pos));
+        }
+        marker.style.left = pos + "%";
+        raf = requestAnimationFrame(frame);
+      }
+      function press(e) {
+        if (e && e.type === "keydown" && !isActionKey(e)) return;
+        if (e) e.preventDefault();
+        const level = levels[round];
+        const hit = pos >= level.start && pos <= level.end;
+        if (hit) changeResistance(0.5, "Acierto: +0.50%");
+        else if (!changeResistance(-5, "Error leve: -5%")) return;
+        round += 1;
+        if (round >= levels.length) completeMoment(0);
+        else showLevel();
+      }
+      showLevel();
+      action.addEventListener("click", press);
+      window.addEventListener("keydown", press);
+      raf = requestAnimationFrame(frame);
+      state.activeCleanup = () => {
+        cancelAnimationFrame(raf);
+        window.removeEventListener("keydown", press);
+      };
+    }
+
+    function playBalanceGodot() {
+      miniInner.classList.add("godot-mode");
+      miniInner.innerHTML = `
+        <div class="mobile-landscape-hint" role="status">
+          Gira el celular horizontalmente para ver y jugar este tramo con claridad.
+        </div>
+        <div id="godotTramo2Loader" class="godot-loading-shell" role="status" aria-live="polite">
+          <div class="godot-loading-card">
+            <strong>Preparando el camino irregular</strong>
+            <p id="godotTramo2Status">Cargando el juego 3D. Puede tardar unos segundos la primera vez.</p>
+            <progress id="godotTramo2Progress"></progress>
+          </div>
+        </div>
+        <iframe
+          id="godotTramo2Frame"
+          class="godot-tramo2-frame"
+          src="tramo2/index.html"
+          title="Tramo 2: Camino irregular"
+          allow="autoplay; fullscreen; gamepad"
+        ></iframe>
+      `;
+      bottomActionBtn.style.display = "none";
+      const frame = document.getElementById("godotTramo2Frame");
+      const loader = document.getElementById("godotTramo2Loader");
+      const loaderStatus = document.getElementById("godotTramo2Status");
+      const loaderProgress = document.getElementById("godotTramo2Progress");
+
+      function receiveTramo2Result(event) {
+        if (event.origin !== INTERNAL_ORIGIN || event.source !== frame.contentWindow || !isMessageObject(event.data)) return;
+        if (event.data.type === "tramo_2_carga") {
+          if (!hasOnlyMessageKeys(event.data, ["type", "current", "total"]) ||
+              typeof event.data.current !== "number" || !Number.isFinite(event.data.current) || event.data.current < 0 ||
+              typeof event.data.total !== "number" || !Number.isFinite(event.data.total) || event.data.total < 0) return;
+          const current = event.data.current;
+          const total = event.data.total;
+          if (total > 0) {
+            const percent = Math.max(0, Math.min(100, Math.round(current / total * 100)));
+            loaderProgress.value = current;
+            loaderProgress.max = total;
+            loaderStatus.textContent = "Cargando el juego 3D: " + percent + "%";
+          } else {
+            loaderProgress.removeAttribute("value");
+            loaderStatus.textContent = "Inicializando el motor 3D...";
+          }
+          return;
+        }
+        if (event.data.type === "tramo_2_listo") {
+          if (!hasOnlyMessageKeys(event.data, ["type"])) return;
+          loaderStatus.textContent = "¡Listo!";
+          loader.classList.add("is-ready");
+          frame.focus();
+          return;
+        }
+        if (event.data.type === "tramo_2_caida_vacio") {
+          if (!hasOnlyMessageKeys(event.data, ["type"])) return;
+          changeResistance(-5, "Caída al vacío: -5% de resistencia");
+          return;
+        }
+        if (event.data.type === "tramo_2_completado" && hasOnlyMessageKeys(event.data, ["type"])) completeMoment(5);
+      }
+
+      window.addEventListener("message", receiveTramo2Result);
+      frame.addEventListener("load", () => { loaderStatus.textContent = "Inicializando el motor 3D..."; }, { once: true });
+      state.activeCleanup = () => {
+        window.removeEventListener("message", receiveTramo2Result);
+        miniInner.classList.remove("godot-mode");
+        bottomActionBtn.style.display = "";
+        frame.remove();
+      };
+    }
+
+    function playCircuitoEsperanza() {
+      miniInner.classList.add("godot-mode");
+      miniInner.innerHTML = `
+        <iframe
+          id="tramo3Frame"
+          class="godot-tramo2-frame"
+          src="tramo3/index.html"
+          title="Tramo 3: Senderos de Luz"
+          allow="autoplay; fullscreen"
+        ></iframe>
+      `;
+      bottomActionBtn.style.display = "none";
+      const frame = document.getElementById("tramo3Frame");
+
+      function receiveTramo3Result(event) {
+        if (event.origin !== INTERNAL_ORIGIN || event.source !== frame.contentWindow ||
+            !isMessageObject(event.data) || event.data.type !== "tramo_3_completado" ||
+            !hasOnlyMessageKeys(event.data, ["type", "levels"]) || event.data.levels !== 7) return;
+        completeMoment(5);
+      }
+
+      window.addEventListener("message", receiveTramo3Result);
+      frame.addEventListener("load", () => frame.focus(), { once: true });
+      state.activeCleanup = () => {
+        window.removeEventListener("message", receiveTramo3Result);
+        miniInner.classList.remove("godot-mode");
+        bottomActionBtn.style.display = "";
+        frame.remove();
+      };
+    }
+
+    function playReactionGodot() {
+      const graphicsProbe = document.createElement("canvas");
+      if (!graphicsProbe.getContext("webgl2")) {
+        showToast("Modo compatible activado");
+        playReactionNetwork();
+        return;
+      }
+      miniInner.classList.add("godot-mode");
+      miniInner.innerHTML = `
+        <div class="mobile-landscape-hint" role="status">
+          Gira el celular horizontalmente para ver y jugar este tramo con claridad.
+        </div>
+        <iframe
+          id="tramo7Frame"
+          class="godot-tramo2-frame"
+          src="tramo7/index.html"
+          title="Tramo 7"
+          allow="autoplay; fullscreen"
+        ></iframe>
+      `;
+      bottomActionBtn.style.display = "none";
+      const frame = document.getElementById("tramo7Frame");
+
+      function receiveTramo7Result(event) {
+        if (event.origin !== INTERNAL_ORIGIN || event.source !== frame.contentWindow || !isMessageObject(event.data)) return;
+        if (event.data.type === "tramo_7_penalizacion") {
+          if (!hasOnlyMessageKeys(event.data, ["type", "amount"]) ||
+              typeof event.data.amount !== "number" || !Number.isFinite(event.data.amount) ||
+              event.data.amount < 1 || event.data.amount > 100) return;
+          const amount = event.data.amount;
+          changeResistance(-amount, `Virtud esencial alcanzada: -${amount}%`);
+          return;
+        }
+        if (event.data.type === "tramo_7_completado" && hasOnlyMessageKeys(event.data, ["type"])) completeMoment(5);
+      }
+
+      window.addEventListener("message", receiveTramo7Result);
+      frame.addEventListener("load", () => frame.focus(), { once: true });
+      state.activeCleanup = () => {
+        window.removeEventListener("message", receiveTramo7Result);
+        miniInner.classList.remove("godot-mode");
+        bottomActionBtn.style.display = "";
+        frame.remove();
+      };
+    }
+
+    function playBalanceLegacy() {
+      miniInner.innerHTML = "";
+      miniArea.insertAdjacentHTML("beforeend", `
+        <div class="rollance-stage" id="rollanceStage">
+          <div class="rollance-path" id="rollancePath"></div>
+          <img class="rollance-ball" id="rollanceBall" src="assets/jesus-cruz.png" alt="Jesús en equilibrio">
+          <div class="prompt" style="position:absolute;left:50%;top:16px;transform:translateX(-50%);z-index:4;">Equilibrio: <span id="rollPct">0</span>% hacia la meta</div>
+          <button class="secondary-btn roll-left" type="button" style="position:absolute;left:18px;bottom:18px;z-index:4;">←</button>
+          <button class="secondary-btn roll-right" type="button" style="position:absolute;right:18px;bottom:18px;z-index:4;">→</button>
+        </div>
+      `);
+      const stage = document.getElementById("rollanceStage");
+      const path = document.getElementById("rollancePath");
+      const ball = document.getElementById("rollanceBall");
+      const pct = document.getElementById("rollPct");
+      const keys = new Set();
+      const hazards = [
+        { type: "hole", x: 28, hit: false },
+        { type: "gem", x: 42, hit: false },
+        { type: "hole", x: 57, hit: false },
+        { type: "gem", x: 72, hit: false },
+        { type: "hole", x: 84, hit: false }
+      ];
+      hazards.forEach(h => {
+        const el = document.createElement("div");
+        el.className = h.type === "hole" ? "rollance-hole" : "rollance-gem";
+        el.style.left = h.x + "%";
+        stage.appendChild(el);
+        h.el = el;
+      });
+      let progress = 0;
+      let lane = 0;
+      let roll = 0;
+      let raf = 0;
+      let last = performance.now();
+
+      function setInput(code, on) {
+        if (on) keys.add(code);
+        else keys.delete(code);
+      }
+      function down(e) {
+        if (e.code === "ArrowLeft" || e.code === "ArrowRight") {
+          keys.add(e.code);
+          e.preventDefault();
+        }
+      }
+      function up(e) { keys.delete(e.code); }
+      function frame(now) {
+        if (window.__unifiedPaused) { raf = requestAnimationFrame(frame); return; }
+        const dt = Math.min(34, now - last) / 16;
+        last = now;
+        progress += .115 * dt;
+        if (keys.has("ArrowLeft")) lane -= 1.8 * dt;
+        if (keys.has("ArrowRight")) lane += 1.8 * dt;
+        lane += Math.sin(progress / 6) * .18 * dt;
+        lane = Math.max(-46, Math.min(46, lane));
+        roll += (keys.has("ArrowRight") ? 7 : 0) - (keys.has("ArrowLeft") ? 7 : 0) + 2.5;
+        ball.style.transform = `translateX(${lane}px) rotate(${roll}deg)`;
+        path.style.transform = `translateX(${-progress * 9}px)`;
+        pct.textContent = Math.min(100, Math.floor(progress)).toString();
+
+        hazards.forEach(h => {
+          if (h.hit) return;
+          const distance = Math.abs(progress - h.x);
+          if (distance < 2.2) {
+            h.hit = true;
+            if (h.type === "gem") {
+              changeResistance(5, "Energía recuperada: +5%");
+              h.el.remove();
+            } else if (Math.abs(lane) < 22) {
+              if (!changeResistance(-10, "Perdiste equilibrio: -10%")) return;
+              showToast("Corrige con las flechas");
+            } else {
+              showToast("Hueco evitado");
+            }
+          }
+        });
+        if (Math.abs(lane) > 43) {
+          lane *= .55;
+          if (!changeResistance(-5, "Borde del camino: -5%")) return;
+        }
+        if (progress >= 100) {
+          completeMoment(5);
+          return;
+        }
+        raf = requestAnimationFrame(frame);
+      }
+      const leftBtn = stage.querySelector(".roll-left");
+      const rightBtn = stage.querySelector(".roll-right");
+      leftBtn.addEventListener("pointerdown", () => setInput("ArrowLeft", true));
+      leftBtn.addEventListener("pointerup", () => setInput("ArrowLeft", false));
+      leftBtn.addEventListener("pointerleave", () => setInput("ArrowLeft", false));
+      rightBtn.addEventListener("pointerdown", () => setInput("ArrowRight", true));
+      rightBtn.addEventListener("pointerup", () => setInput("ArrowRight", false));
+      rightBtn.addEventListener("pointerleave", () => setInput("ArrowRight", false));
+      window.addEventListener("keydown", down);
+      window.addEventListener("keyup", up);
+      raf = requestAnimationFrame(frame);
+      state.activeCleanup = () => {
+        cancelAnimationFrame(raf);
+        window.removeEventListener("keydown", down);
+        window.removeEventListener("keyup", up);
+        const rollance = document.getElementById("rollanceStage");
+        if (rollance) rollance.remove();
+      };
+    }
+
+    function playBalance() {
+      miniInner.innerHTML = "";
+      miniArea.insertAdjacentHTML("beforeend", `
+        <div class="rollance-stage" id="rollanceStage">
+          <div class="rollance-path" id="rollancePath"></div>
+          <div class="rollance-edge" id="rollanceEdge"></div>
+          <div class="rollance-goal">META</div>
+          <img class="rollance-ball" id="rollanceBall" src="assets/jesus-bolita-1.jpeg" alt="Jesús en equilibrio">
+          <div class="prompt" style="position:absolute;left:50%;top:16px;transform:translateX(-50%);z-index:4;">Camino irregular: <span id="rollPct">0</span>%</div>
+          <button class="secondary-btn roll-left" type="button" style="position:absolute;left:18px;bottom:18px;z-index:4;">←</button>
+          <button class="secondary-btn roll-right" type="button" style="position:absolute;right:18px;bottom:18px;z-index:4;">→</button>
+        </div>
+      `);
+      const stage = document.getElementById("rollanceStage");
+      const path = document.getElementById("rollancePath");
+      const edge = document.getElementById("rollanceEdge");
+      const ball = document.getElementById("rollanceBall");
+      const pct = document.getElementById("rollPct");
+      const keys = new Set();
+      const frames = ["assets/jesus-bolita-1.jpeg", "assets/jesus-bolita-2.jpeg", "assets/jesus-bolita-3.jpeg"];
+      let progress = 0;
+      let x = 0;
+      let velocity = 0;
+      let roll = 0;
+      let raf = 0;
+      let last = performance.now();
+      let mistakes = 0;
+      let frameTick = 0;
+      let ended = false;
+
+      const pathPoints = [
+        { p: 0, cx: 0, w: 250 },
+        { p: 14, cx: -105, w: 190 },
+        { p: 28, cx: 120, w: 160 },
+        { p: 44, cx: -145, w: 145 },
+        { p: 62, cx: 135, w: 135 },
+        { p: 80, cx: -85, w: 120 },
+        { p: 100, cx: 0, w: 110 }
+      ];
+
+      function setInput(code, on) {
+        if (on) keys.add(code);
+        else keys.delete(code);
+      }
+      function down(e) {
+        if (e.code === "ArrowLeft" || e.code === "ArrowRight") {
+          keys.add(e.code);
+          e.preventDefault();
+        }
+      }
+      function up(e) { keys.delete(e.code); }
+      function samplePath(p) {
+        for (let i = 0; i < pathPoints.length - 1; i++) {
+          const a = pathPoints[i];
+          const b = pathPoints[i + 1];
+          if (p >= a.p && p <= b.p) {
+            const t = (p - a.p) / (b.p - a.p);
+            const smooth = t * t * (3 - 2 * t);
+            return {
+              cx: a.cx + (b.cx - a.cx) * smooth,
+              w: a.w + (b.w - a.w) * smooth
+            };
+          }
+        }
+        return pathPoints[pathPoints.length - 1];
+      }
+      function frame(now) {
+        if (window.__unifiedPaused) { raf = requestAnimationFrame(frame); return; }
+        if (ended) return;
+        const dt = Math.min(34, now - last) / 16;
+        last = now;
+        progress += .082 * dt;
+        const track = samplePath(progress);
+        if (keys.has("ArrowLeft")) velocity -= .92 * dt;
+        if (keys.has("ArrowRight")) velocity += .92 * dt;
+        velocity *= .945;
+        x += velocity * dt;
+        x += (track.cx - x) * .004 * dt;
+        roll += (velocity * 2.2 + 4.4) * dt;
+        frameTick += dt;
+        if (frameTick > 12) {
+          frameTick = 0;
+          ball.src = frames[Math.floor(progress / 4) % frames.length];
+        }
+        ball.style.transform = `translateX(${x}px) rotate(${roll}deg)`;
+        path.style.backgroundPositionY = (progress * 28) + "px";
+        path.style.clipPath = `polygon(${50 - track.w / 7}% 0, ${50 + track.w / 7}% 0, 94% 100%, 6% 100%)`;
+        edge.style.clipPath = path.style.clipPath;
+        pct.textContent = Math.min(100, Math.floor(progress)).toString();
+
+        const distanceFromCenter = Math.abs(x - track.cx);
+        if (distanceFromCenter > track.w * .72) {
+          mistakes += 1;
+          progress = Math.max(0, progress - 8);
+          x = track.cx;
+          velocity = 0;
+          if (!changeResistance(-10, "Casi cae del camino: -10%")) return;
+          if (mistakes >= 6) {
+            ended = true;
+            showRetry();
+            return;
+          }
+        }
+        if (progress >= 100) {
+          completeMoment(5);
+          return;
+        }
+        if (ended || modal.classList.contains("show")) return;
+        raf = requestAnimationFrame(frame);
+      }
+      const leftBtn = stage.querySelector(".roll-left");
+      const rightBtn = stage.querySelector(".roll-right");
+      leftBtn.addEventListener("pointerdown", () => setInput("ArrowLeft", true));
+      leftBtn.addEventListener("pointerup", () => setInput("ArrowLeft", false));
+      leftBtn.addEventListener("pointerleave", () => setInput("ArrowLeft", false));
+      rightBtn.addEventListener("pointerdown", () => setInput("ArrowRight", true));
+      rightBtn.addEventListener("pointerup", () => setInput("ArrowRight", false));
+      rightBtn.addEventListener("pointerleave", () => setInput("ArrowRight", false));
+      window.addEventListener("keydown", down);
+      window.addEventListener("keyup", up);
+      raf = requestAnimationFrame(frame);
+      state.activeCleanup = () => {
+        ended = true;
+        cancelAnimationFrame(raf);
+        window.removeEventListener("keydown", down);
+        window.removeEventListener("keyup", up);
+        const rollance = document.getElementById("rollanceStage");
+        if (rollance) rollance.remove();
+      };
+    }
+
+    function playBreathingLegacy() {
+      const levels = [
+        [{ x: 24, y: 64 }, { x: 36, y: 45 }, { x: 52, y: 55 }, { x: 68, y: 32 }],
+        [{ x: 18, y: 72 }, { x: 30, y: 54 }, { x: 42, y: 66 }, { x: 56, y: 42 }, { x: 76, y: 28 }],
+        [{ x: 18, y: 35 }, { x: 28, y: 55 }, { x: 43, y: 44 }, { x: 55, y: 64 }, { x: 68, y: 48 }, { x: 82, y: 24 }],
+        [{ x: 15, y: 75 }, { x: 25, y: 55 }, { x: 35, y: 70 }, { x: 47, y: 44 }, { x: 58, y: 58 }, { x: 70, y: 36 }, { x: 84, y: 22 }]
+      ];
+      let level = 0;
+      let index = 0;
+      setMini(`
+        <div class="prompt">Energía: bucles antiestres - nivel 1 de 4</div>
+        <div class="loop-game" id="loopGame"></div>
+        <div class="round-info">Conecta el rayo hasta el corazón siguiendo el camino.</div>
+      `);
+      const gameEl = document.getElementById("loopGame");
+      const prompt = miniInner.querySelector(".prompt");
+      const info = miniInner.querySelector(".round-info");
+
+      function drawLevel() {
+        index = 0;
+        gameEl.innerHTML = `<svg class="loop-path" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>`;
+        const svg = gameEl.querySelector("svg");
+        const pts = levels[level];
+        for (let i = 0; i < pts.length - 1; i++) {
+          const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+          line.setAttribute("x1", pts[i].x);
+          line.setAttribute("y1", pts[i].y);
+          line.setAttribute("x2", pts[i + 1].x);
+          line.setAttribute("y2", pts[i + 1].y);
+          line.classList.add("loop-line");
+          svg.appendChild(line);
+        }
+        pts.forEach((pt, i) => {
+          const node = document.createElement("button");
+          node.type = "button";
+          node.className = "loop-node" + (i === pts.length - 1 ? " goal" : "") + (i === 0 ? " active" : "");
+          node.textContent = i === 0 ? "⚡" : (i === pts.length - 1 ? "♥" : "");
+          node.style.left = pt.x + "%";
+          node.style.top = pt.y + "%";
+          node.addEventListener("click", () => chooseNode(i));
+          gameEl.appendChild(node);
+        });
+        prompt.textContent = "Energía: bucles antiestres - nivel " + (level + 1) + " de 4";
+        info.textContent = "Conecta el rayo hasta el corazón siguiendo el camino.";
+      }
+
+      function chooseNode(i) {
+        const nodesEls = [...gameEl.querySelectorAll(".loop-node")];
+        const lines = [...gameEl.querySelectorAll(".loop-line")];
+        if (i === index + 1) {
+          index = i;
+          nodesEls[i].classList.add("active");
+          if (lines[i - 1]) lines[i - 1].classList.add("on");
+          if (index === levels[level].length - 1) {
+            changeResistance(5, "Corazón conectado: +5%");
+            level += 1;
+            if (level >= levels.length) completeMoment(5);
+            else setTimeout(drawLevel, 550);
+          }
+        } else if (i !== index) {
+          changeResistance(-5, "Conexión incorrecta: -5%");
+        }
+      }
+
+      drawLevel();
+      state.activeCleanup = () => {};
+    }
+
+    function playBreathing() {
+      const levels = [
+        { size: 3, path: [[0,1],[1,1],[1,2],[2,2]], start: [0,1], goal: [2,2] },
+        { size: 4, path: [[0,0],[1,0],[1,1],[2,1],[2,2],[3,2]], start: [0,0], goal: [3,2] },
+        { size: 4, path: [[0,3],[1,3],[1,2],[2,2],[2,1],[3,1],[3,0]], start: [0,3], goal: [3,0] },
+        { size: 5, path: [[0,2],[1,2],[1,1],[2,1],[2,2],[3,2],[3,3],[4,3]], start: [0,2], goal: [4,3] }
+      ];
+      let level = 0;
+      let tiles = [];
+      setMini(`
+        <div class="prompt">Energía: bucles antiestres - nivel 1 de 4</div>
+        <div class="energy-board" id="energyBoard"></div>
+        <div class="round-info" id="energyInfo">Toca las piezas para girarlas y llevar la energía del rayo al corazón.</div>
+      `);
+      const board = document.getElementById("energyBoard");
+      const prompt = miniInner.querySelector(".prompt");
+      const info = document.getElementById("energyInfo");
+
+      function keyOf(r, c) { return r + "," + c; }
+      function dirsFor(tile) {
+        if (tile.kind === "empty") return [];
+        const base = tile.kind === "straight" ? ["N", "S"] : ["N", "E"];
+        return base.map(d => rotateDir(d, tile.rot));
+      }
+      function rotateDir(dir, rot) {
+        const dirs = ["N", "E", "S", "W"];
+        return dirs[(dirs.indexOf(dir) + rot) % 4];
+      }
+      function opposite(dir) {
+        return { N: "S", S: "N", E: "W", W: "E" }[dir];
+      }
+      function step(r, c, dir) {
+        if (dir === "N") return [r - 1, c];
+        if (dir === "S") return [r + 1, c];
+        if (dir === "E") return [r, c + 1];
+        return [r, c - 1];
+      }
+      function buildTiles() {
+        const cfg = levels[level];
+        const pathSet = new Set(cfg.path.map(([r, c]) => keyOf(r, c)));
+        tiles = [];
+        for (let r = 0; r < cfg.size; r++) {
+          for (let c = 0; c < cfg.size; c++) {
+            const onPath = pathSet.has(keyOf(r, c));
+            let kind = "empty";
+            let targetRot = 0;
+            if (onPath) {
+              const index = cfg.path.findIndex(([pr, pc]) => pr === r && pc === c);
+              const prev = cfg.path[index - 1];
+              const next = cfg.path[index + 1];
+              const dirs = [];
+              [prev, next].forEach(p => {
+                if (!p) return;
+                if (p[0] < r) dirs.push("N");
+                if (p[0] > r) dirs.push("S");
+                if (p[1] < c) dirs.push("W");
+                if (p[1] > c) dirs.push("E");
+              });
+              kind = dirs.includes("N") && dirs.includes("S") || dirs.includes("E") && dirs.includes("W") ? "straight" : "elbow";
+              for (let rot = 0; rot < 4; rot++) {
+                const rotated = kind === "straight" ? ["N", "S"].map(d => rotateDir(d, rot)) : ["N", "E"].map(d => rotateDir(d, rot));
+                if (dirs.every(d => rotated.includes(d))) targetRot = rot;
+              }
+            }
+            tiles.push({ r, c, kind, rot: onPath ? (targetRot + 1 + ((r + c + level) % 3)) % 4 : 0, targetRot, powered: false, onPath });
+          }
+        }
+      }
+      function draw() {
+        const cfg = levels[level];
+        board.style.gridTemplateColumns = `repeat(${cfg.size}, 1fr)`;
+        board.innerHTML = "";
+        tiles.forEach(tile => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "energy-tile" + (tile.powered ? " powered" : "") + (keyOf(tile.r, tile.c) === keyOf(...cfg.goal) ? " heart" : "");
+          btn.style.setProperty("--rot", (tile.rot * 90) + "deg");
+          btn.style.setProperty("--elbow", tile.kind === "elbow" ? "block" : "none");
+          btn.textContent = keyOf(tile.r, tile.c) === keyOf(...cfg.start) ? "⚡" : (keyOf(tile.r, tile.c) === keyOf(...cfg.goal) ? "♥" : "");
+          btn.disabled = tile.kind === "empty";
+          btn.addEventListener("click", () => {
+            if (tile.kind === "empty") return;
+            tile.rot = (tile.rot + 1) % 4;
+            updatePower();
+          });
+          board.appendChild(btn);
+        });
+      }
+      function updatePower() {
+        tiles.forEach(t => t.powered = false);
+        const cfg = levels[level];
+        const byKey = new Map(tiles.map(t => [keyOf(t.r, t.c), t]));
+        const queue = [cfg.start];
+        const seen = new Set();
+        while (queue.length) {
+          const [r, c] = queue.shift();
+          const k = keyOf(r, c);
+          if (seen.has(k)) continue;
+          seen.add(k);
+          const tile = byKey.get(k);
+          if (!tile || tile.kind === "empty") continue;
+          tile.powered = true;
+          dirsFor(tile).forEach(dir => {
+            const [nr, nc] = step(r, c, dir);
+            const next = byKey.get(keyOf(nr, nc));
+            if (next && dirsFor(next).includes(opposite(dir))) queue.push([nr, nc]);
+          });
+        }
+        draw();
+        const goal = byKey.get(keyOf(...cfg.goal));
+        if (goal && goal.powered) {
+          changeResistance(5, "Energía conectada: +5%");
+          level += 1;
+          if (level >= levels.length) completeMoment(5);
+          else {
+            prompt.textContent = "Energía: bucles antiestres - nivel " + (level + 1) + " de 4";
+            info.textContent = "Muy bien. Ahora conecta el siguiente circuito.";
+            setTimeout(() => {
+              buildTiles();
+              updatePower();
+            }, 650);
+          }
+        }
+      }
+      buildTiles();
+      updatePower();
+      state.activeCleanup = () => {};
+    }
+
+    function playRunner() {
+      const totalObstacles = 80;
+      miniInner.innerHTML = "";
+      miniArea.insertAdjacentHTML("beforeend", `
+        <div class="runner" id="runnerStage">
+          <div class="runner-road"></div>
+          <img class="runner-jesus" id="runnerJesus" src="assets/jesus-walk-1.png" alt="">
+          <div class="prompt" style="position:absolute;left:50%;top:16px;transform:translateX(-50%);z-index:3;">Camino recorrido: <span id="runCount">0</span> / ${totalObstacles}</div>
+        </div>
+      `);
+      const stage = document.getElementById("runnerStage");
+      const hero = document.getElementById("runnerJesus");
+      const countEl = document.getElementById("runCount");
+      const frames = ["assets/jesus-walk-1.png", "assets/jesus-walk-2.png", "assets/jesus-walk-3.png", "assets/jesus-walk-4.png", "assets/jesus-walk-5.png"];
+      let jumping = false;
+      let crouching = false;
+      let count = 0;
+      let speed = 4.15;
+      let spawnTimer = 650;
+      let raf = 0;
+      let frameTick = 0;
+      let jumpY = 0;
+      let jumpVelocity = 0;
+      let jumpHeld = false;
+      let lastFrameTime = performance.now();
+      let obstacleBag = [];
+      let lastObstacleVisual = "";
+      const obstacles = [];
+
+      function nextObstacleVisual() {
+        if (obstacleBag.length === 0) {
+          obstacleBag = ["rock", "torch", "wood"];
+          for (let index = obstacleBag.length - 1; index > 0; index -= 1) {
+            const swapIndex = Math.floor(Math.random() * (index + 1));
+            [obstacleBag[index], obstacleBag[swapIndex]] = [obstacleBag[swapIndex], obstacleBag[index]];
+          }
+          if (obstacleBag[0] === lastObstacleVisual) {
+            [obstacleBag[0], obstacleBag[1]] = [obstacleBag[1], obstacleBag[0]];
+          }
+        }
+        lastObstacleVisual = obstacleBag.shift();
+        return lastObstacleVisual;
+      }
+
+      function spawn() {
+        const visual = nextObstacleVisual();
+        const high = visual === "wood";
+        const torch = visual === "torch";
+        const ob = document.createElement("div");
+        ob.className = "obstacle " + (high ? "high wood" : (torch ? "torch" : "rock"));
+        ob.textContent = high ? "Madero" : (torch ? "" : "Piedra");
+        ob.dataset.type = high ? "high" : "low";
+        stage.appendChild(ob);
+        obstacles.push({ el: ob, x: stage.clientWidth + 120, judged: false, type: ob.dataset.type });
+      }
+      function jump() {
+        if (jumping || crouching) return;
+        jumping = true;
+        jumpY = 12;
+        jumpVelocity = 820;
+        hero.style.bottom = `calc(24% + ${jumpY}px)`;
+      }
+      function crouch(on) {
+        crouching = on;
+        hero.classList.toggle("crouch", on);
+      }
+      function key(e) {
+        if (e.code === "ArrowUp" || e.code === "Space") {
+          e.preventDefault();
+          if (!e.repeat && (!jumpHeld || !e.isTrusted)) jump();
+          if (e.isTrusted) jumpHeld = true;
+        }
+        if (e.code === "ArrowDown") {
+          e.preventDefault();
+          crouch(true);
+        }
+      }
+      function keyup(e) {
+        if (e.code === "ArrowUp" || e.code === "Space") jumpHeld = false;
+        if (e.code === "ArrowDown") crouch(false);
+      }
+      function touchJump(e) {
+        if (e && e.isPrimary === false) return;
+        if (e) e.preventDefault();
+        jump();
+      }
+      function frame(now) {
+        if (window.__unifiedPaused) { raf = requestAnimationFrame(frame); return; }
+        const delta = Math.min(.034, Math.max(.001, (now - lastFrameTime) / 1000));
+        const frameScale = delta * 60;
+        lastFrameTime = now;
+        spawnTimer -= delta * 1000;
+        frameTick += 1;
+        if (jumping) {
+          jumpVelocity -= (jumpVelocity > 0 ? 1900 : 4400) * delta;
+          jumpY += jumpVelocity * delta;
+          if (jumpY <= 0) {
+            jumpY = 0;
+            jumpVelocity = 0;
+            jumping = false;
+          }
+          hero.style.bottom = `calc(24% + ${jumpY.toFixed(1)}px)`;
+        }
+        if (!jumping && !crouching && frameTick % 8 === 0) {
+          hero.src = frames[Math.floor(frameTick / 8) % frames.length];
+        }
+        if (spawnTimer <= 0 && count < totalObstacles) {
+          spawn();
+          const baseGap = Math.max(900, 1650 - count * 20);
+          const rhythms = [.82, 1.0, 1.22, 1.42];
+          const rhythm = rhythms[Math.floor(Math.random() * rhythms.length)];
+          spawnTimer = Math.max(820, baseGap * rhythm + Math.random() * 120);
+        }
+        obstacles.forEach((ob) => {
+          ob.x -= speed * frameScale;
+          ob.el.style.right = (stage.clientWidth - ob.x) + "px";
+          const heroX = stage.clientWidth * .1 + 56;
+          if (!ob.judged && ob.x < heroX + 32) {
+            ob.judged = true;
+            const ok = ob.type === "low" ? jumpY > 48 : crouching;
+            if (ok) showToast("Reacción correcta");
+            else changeResistance(-5, "Error leve: -5%");
+            count += 1;
+            countEl.textContent = count;
+            const finalStretch = count >= 60;
+            speed = Math.min(finalStretch ? 10.2 : 7.6, speed + (finalStretch ? .16 : .11));
+          }
+          if (ob.x < -140) {
+            ob.el.remove();
+          }
+        });
+        for (let i = obstacles.length - 1; i >= 0; i--) {
+          if (!obstacles[i].el.isConnected) obstacles.splice(i, 1);
+        }
+        if (count >= totalObstacles && obstacles.length === 0) {
+          completeMoment(3);
+          return;
+        }
+        raf = requestAnimationFrame(frame);
+      }
+      window.addEventListener("keydown", key);
+      window.addEventListener("keyup", keyup);
+      stage.addEventListener("pointerdown", touchJump, { passive: false });
+      bottomActionBtn.addEventListener("pointerdown", touchJump, { passive: false });
+      raf = requestAnimationFrame(frame);
+      state.activeCleanup = () => {
+        cancelAnimationFrame(raf);
+        window.removeEventListener("keydown", key);
+        window.removeEventListener("keyup", keyup);
+        stage.removeEventListener("pointerdown", touchJump);
+        bottomActionBtn.removeEventListener("pointerdown", touchJump);
+        const runner = document.getElementById("runnerStage");
+        if (runner) runner.remove();
+      };
+    }
+
+    function playSimon() {
+      const images = [
+        "assets/historias biblicas.jpg",
+        "assets/simon-y-cristo.png",
+        "assets/simon-2.png",
+        "assets/simon-orando.png",
+        "assets/las-aventuras-de-jesus.jpeg",
+        "assets/juntos-biblia.jpg"
+      ];
+      const layouts = [
+        { cols: 2, rows: 2 },
+        { cols: 3, rows: 2 },
+        { cols: 3, rows: 3 },
+        { cols: 4, rows: 3 },
+        { cols: 5, rows: 3 },
+        { cols: 4, rows: 4 }
+      ];
+      const moveLimits = [6, 7, 8, 9, 10, 12];
+      let level = 0;
+      let order = [];
+      let selected = null;
+      let moves = 0;
+      let dragState = null;
+      let puzzleLocked = false;
+      setMini(`
+        <div class="prompt">Rompecabezas del camino - imagen 1 de 6</div>
+        <div class="puzzle-wrap">
+          <div class="puzzle-board" id="puzzleBoard"></div>
+          <div class="puzzle-side">
+            <img class="puzzle-preview" id="puzzlePreview" src="assets/historias biblicas.jpg" alt="Imagen guía del rompecabezas">
+            <div class="round-info" id="puzzleInfo">Arrastra una pieza sobre otra para intercambiarlas.</div>
+          </div>
+        </div>
+      `);
+      const board = document.getElementById("puzzleBoard");
+      const preview = document.getElementById("puzzlePreview");
+      const prompt = miniInner.querySelector(".prompt");
+      const info = document.getElementById("puzzleInfo");
+
+      function currentMoveLimit() {
+        return moveLimits[level];
+      }
+
+      function shuffle(pieceCount) {
+        order = Array.from({ length: pieceCount }, (_, index) => index);
+        const swapCount = Math.min(currentMoveLimit(), pieceCount - 1);
+        const allPieces = [...order];
+        allPieces.sort(() => Math.random() - .5);
+        const cycle = allPieces.slice(0, swapCount + 1);
+        cycle.sort(() => Math.random() - .5);
+        for (let index = 0; index < cycle.length - 1; index += 1) {
+          const first = cycle[index];
+          const second = cycle[index + 1];
+          [order[first], order[second]] = [order[second], order[first]];
+        }
+      }
+
+      function isPieceCorrect(piece, slot) {
+        return piece === slot;
+      }
+
+      function isPuzzleSolved() {
+        return order.every((piece, slot) => isPieceCorrect(piece, slot));
+      }
+
+      function pieceStyle(piece) {
+        const layout = layouts[level];
+        const column = piece % layout.cols;
+        const row = Math.floor(piece / layout.cols);
+        const x = layout.cols === 1 ? 0 : column / (layout.cols - 1) * 100;
+        const y = layout.rows === 1 ? 0 : row / (layout.rows - 1) * 100;
+        return {
+          size: `${layout.cols * 100}% ${layout.rows * 100}%`,
+          position: `${x}% ${y}%`
+        };
+      }
+
+      function applyPieceImage(tile, piece) {
+        const style = pieceStyle(piece);
+        tile.style.backgroundImage = `url("${images[level]}")`;
+        tile.style.backgroundSize = style.size;
+        tile.style.backgroundPosition = style.position;
+      }
+
+      function drawPuzzle() {
+        cleanupDrag();
+        selected = null;
+        moves = 0;
+        puzzleLocked = false;
+        const layout = layouts[level];
+        const pieceCount = layout.cols * layout.rows;
+        shuffle(pieceCount);
+        board.innerHTML = "";
+        board.style.setProperty("--puzzle-cols", layout.cols);
+        board.style.setProperty("--puzzle-rows", layout.rows);
+        preview.src = images[level];
+        prompt.textContent = "Rompecabezas del camino - imagen " + (level + 1) + " de " + images.length;
+        info.textContent = `Arrastra las ${pieceCount} piezas. Oportunidades: ${currentMoveLimit()} movimientos.`;
+        order.forEach((piece, slot) => {
+          const tile = document.createElement("button");
+          tile.type = "button";
+          tile.className = "puzzle-tile";
+          tile.dataset.slot = slot;
+          tile.setAttribute("aria-label", `Pieza ${slot + 1} de ${pieceCount}. Arrastra para intercambiar.`);
+          applyPieceImage(tile, piece);
+          tile.classList.toggle("correct", isPieceCorrect(piece, slot));
+          tile.addEventListener("pointerdown", event => beginDrag(event, slot, tile));
+          tile.addEventListener("pointermove", moveDrag);
+          tile.addEventListener("pointerup", endDrag);
+          tile.addEventListener("pointercancel", cancelDrag);
+          tile.addEventListener("keydown", event => {
+            if (event.code !== "Enter" && event.code !== "Space") return;
+            event.preventDefault();
+            chooseTile(slot);
+          });
+          board.appendChild(tile);
+        });
+      }
+
+      function beginDrag(event, slot, tile) {
+        if (puzzleLocked || (event.pointerType === "mouse" && event.button !== 0)) return;
+        event.preventDefault();
+        cleanupDrag();
+        const rect = tile.getBoundingClientRect();
+        const ghost = tile.cloneNode(false);
+        ghost.className = "puzzle-tile puzzle-drag-ghost";
+        ghost.removeAttribute("data-slot");
+        ghost.style.width = rect.width + "px";
+        ghost.style.height = rect.height + "px";
+        document.body.appendChild(ghost);
+        tile.classList.add("dragging");
+        tile.setPointerCapture?.(event.pointerId);
+        dragState = { pointerId: event.pointerId, from: slot, tile, ghost, target: null };
+        positionGhost(event.clientX, event.clientY);
+      }
+
+      function positionGhost(x, y) {
+        if (!dragState) return;
+        dragState.ghost.style.left = x + "px";
+        dragState.ghost.style.top = y + "px";
+      }
+
+      function findDropTarget(x, y) {
+        const element = document.elementFromPoint(x, y);
+        return element?.closest?.(".puzzle-tile:not(.puzzle-drag-ghost)") || null;
+      }
+
+      function moveDrag(event) {
+        if (!dragState || event.pointerId !== dragState.pointerId) return;
+        event.preventDefault();
+        positionGhost(event.clientX, event.clientY);
+        const target = findDropTarget(event.clientX, event.clientY);
+        if (dragState.target && dragState.target !== target) dragState.target.classList.remove("drag-target");
+        dragState.target = target;
+        if (target && Number(target.dataset.slot) !== dragState.from) target.classList.add("drag-target");
+      }
+
+      function endDrag(event) {
+        if (!dragState || event.pointerId !== dragState.pointerId) return;
+        event.preventDefault();
+        const from = dragState.from;
+        const target = findDropTarget(event.clientX, event.clientY) || dragState.target;
+        const to = target ? Number(target.dataset.slot) : from;
+        cleanupDrag();
+        if (Number.isInteger(to) && to !== from) swapPieces(from, to);
+      }
+
+      function cancelDrag() {
+        cleanupDrag();
+      }
+
+      function cleanupDrag() {
+        if (!dragState) return;
+        dragState.tile?.classList.remove("dragging");
+        dragState.target?.classList.remove("drag-target");
+        dragState.ghost?.remove();
+        dragState = null;
+      }
+
+      function swapPieces(from, to) {
+        if (puzzleLocked) return;
+        [order[from], order[to]] = [order[to], order[from]];
+        moves += 1;
+        selected = null;
+        drawTilesOnly();
+        checkPuzzle();
+      }
+
+      function chooseTile(slot) {
+        const tiles = [...board.querySelectorAll(".puzzle-tile")];
+        if (selected === null) {
+          selected = slot;
+          tiles[slot].style.outline = "5px solid #ffd76a";
+          return;
+        }
+        tiles[selected].style.outline = "";
+        if (selected !== slot) {
+          swapPieces(selected, slot);
+        }
+        selected = null;
+      }
+
+      function checkPuzzle() {
+        if (isPuzzleSolved()) {
+          puzzleLocked = true;
+          showToast("Imagen completada sin recompensa adicional");
+          level += 1;
+          if (level >= images.length) completeMoment(0);
+          else setTimeout(drawPuzzle, 700);
+          return;
+        }
+        const moveLimit = currentMoveLimit();
+        if (moves >= moveLimit) {
+          changeResistance(-5, `Movimiento fuera del límite: -5%`);
+          info.textContent = `Agotaste las ${moveLimit} oportunidades. Cada movimiento adicional resta 5%.`;
+        }
+      }
+
+      function drawTilesOnly() {
+        [...board.querySelectorAll(".puzzle-tile")].forEach((tile, slot) => {
+          const piece = order[slot];
+          tile.style.outline = "";
+          applyPieceImage(tile, piece);
+          tile.classList.toggle("correct", isPieceCorrect(piece, slot));
+        });
+        info.textContent = `Movimientos: ${moves} / ${currentMoveLimit()}`;
+      }
+
+      drawPuzzle();
+      state.activeCleanup = cleanupDrag;
+    }
+
+    function playWords() {
+      setMini(`
+        <div class="words-intro">
+          <h2>Perdón ante la burla</h2>
+      <p>Recoge 40 palabras que expresen amor y perdón. Cuando una palabra llegue a la tecla inferior, pulsa la flecha de su carril.</p>
+          <div class="word-examples">
+            <span class="word-example">Perdón ✓</span>
+            <span class="word-example">Amor ✓</span>
+            <span class="word-example bad">Odio ✕</span>
+            <span class="word-example bad">Burla ✕</span>
+          </div>
+          <p>Deja pasar las palabras negativas. Las palabras buenas perdidas y las selecciones incorrectas reducen resistencia.</p>
+          <div class="arrow-guide" aria-label="Flechas de control"><span>←</span><span>↓</span><span>↑</span><span>→</span></div>
+          <button class="primary-btn word-start action" type="button">Iniciar</button>
+        </div>
+      `);
+      const goal = 40;
+      const good = ["Perdón", "Amor", "Misericordia", "Paciencia", "Humildad"];
+      const bad = ["Odio", "Burla", "Rechazo", "Ira", "Venganza"];
+      const notes = [];
+      let prompt = null;
+      let lanes = [];
+      let laneKeys = [];
+      let spawned = 0;
+      let hits = 0;
+      let raf = 0;
+      let spawnTimer = 450;
+      let running = false;
+      let lastFrameTime = performance.now();
+
+      function startGame() {
+        if (running) return;
+        running = true;
+        setMini(`
+          <div class="prompt">Palabras buenas: 0 / ${goal}</div>
+          <div class="lanes">
+            <div class="lane" data-lane="0"><button type="button" class="lane-key" data-lane="0" aria-label="Seleccionar carril izquierdo">←</button></div>
+            <div class="lane" data-lane="1"><button type="button" class="lane-key" data-lane="1" aria-label="Seleccionar carril inferior">↓</button></div>
+            <div class="lane" data-lane="2"><button type="button" class="lane-key" data-lane="2" aria-label="Seleccionar carril superior">↑</button></div>
+            <div class="lane" data-lane="3"><button type="button" class="lane-key" data-lane="3" aria-label="Seleccionar carril derecho">→</button></div>
+          </div>
+        `);
+        prompt = miniInner.querySelector(".prompt");
+        lanes = [...miniInner.querySelectorAll(".lane")];
+        laneKeys = [...miniInner.querySelectorAll(".lane-key")];
+        laneKeys.forEach(key => key.addEventListener("click", () => selectLane(Number(key.dataset.lane))));
+        window.addEventListener("keydown", press);
+        lastFrameTime = performance.now();
+        raf = requestAnimationFrame(frame);
+      }
+
+      function spawn() {
+        const lane = Math.floor(Math.random() * 4);
+        const isGood = Math.random() < .7;
+        const word = document.createElement("div");
+        word.className = "word" + (isGood ? "" : " bad");
+        word.textContent = isGood ? good[Math.floor(Math.random() * good.length)] : bad[Math.floor(Math.random() * bad.length)];
+        lanes[lane].appendChild(word);
+        notes.push({ el: word, lane, y: -58, good: isGood, hit: false });
+        spawned += 1;
+      }
+
+      function flashBadKey(lane) {
+        const key = laneKeys[lane];
+        if (!key) return;
+        key.classList.remove("bad-press");
+        void key.offsetWidth;
+        key.classList.add("bad-press");
+        setTimeout(() => key.classList.remove("bad-press"), 500);
+      }
+
+      function selectLane(lane) {
+        if (!running) return;
+        const target = notes
+          .filter(note => note.lane === lane && !note.hit && note.y > lanes[lane].clientHeight - 130 && note.y < lanes[lane].clientHeight - 42)
+          .sort((first, second) => second.y - first.y)[0];
+        if (!target) {
+          changeResistance(-5, "Fuera de tiempo: -5%");
+          return;
+        }
+        target.hit = true;
+        if (target.good) {
+          target.el.classList.add("good-hit");
+          setTimeout(() => target.el.remove(), 430);
+          hits += 1;
+          if (hits % 3 === 0) changeResistance(1, "Tres palabras buenas: +1%");
+          else showToast("Respuesta con amor");
+        } else {
+          target.el.classList.add("bad-hit");
+          flashBadKey(lane);
+          setTimeout(() => target.el.remove(), 390);
+          changeResistance(-10, "Palabra negativa tomada: -10%");
+        }
+        prompt.textContent = `Palabras buenas: ${hits} / ${goal}`;
+        if (hits >= goal) completeMoment(0);
+      }
+
+      function press(e) {
+        const map = { ArrowLeft: 0, ArrowDown: 1, ArrowUp: 2, ArrowRight: 3 };
+        if (!(e.code in map)) return;
+        e.preventDefault();
+        selectLane(map[e.code]);
+      }
+
+      function frame(now) {
+        if (window.__unifiedPaused) { raf = requestAnimationFrame(frame); return; }
+        const delta = Math.min(.04, Math.max(.001, (now - lastFrameTime) / 1000));
+        lastFrameTime = now;
+        spawnTimer -= delta * 1000;
+        if (spawnTimer <= 0 && hits < goal) {
+          spawn();
+          spawnTimer = 760 + Math.random() * 260;
+        }
+        notes.forEach(n => {
+          if (n.hit) return;
+          n.y += 192 * delta;
+          n.el.style.top = n.y + "px";
+          if (n.y > lanes[n.lane].clientHeight + 20) {
+            n.hit = true;
+            n.el.remove();
+            if (n.good) changeResistance(-5, "Palabra buena perdida: -5%");
+          }
+        });
+        raf = requestAnimationFrame(frame);
+      }
+
+      miniInner.querySelector(".word-start").addEventListener("click", startGame);
+      state.activeCleanup = () => {
+        cancelAnimationFrame(raf);
+        window.removeEventListener("keydown", press);
+        running = false;
+      };
+    }
+
+    function playFinalPrecisionLegacy() {
+      let attempt = 0;
+      let hits = 0;
+      let pos = 0;
+      let dir = 1;
+      let raf = 0;
+      const zones = [[12, 18], [36, 42], [58, 64], [82, 88]];
+      setMini(`
+        <div class="prompt">Intento 1 de 7 - Aciertos 0 / 5</div>
+        <div class="precision-track advanced"><div class="marker"></div></div>
+        <button class="primary-btn action" type="button">Acción</button>
+        <div class="round-info">Varias zonas pequeñas de acierto</div>
+      `);
+      const marker = miniInner.querySelector(".marker");
+      const prompt = miniInner.querySelector(".prompt");
+      const action = miniInner.querySelector(".action");
+      function frame() {
+        if (window.__unifiedPaused) { raf = requestAnimationFrame(frame); return; }
+        pos += dir * 2.75;
+        if (pos >= 100 || pos <= 0) {
+          dir *= -1;
+          pos = Math.max(0, Math.min(100, pos));
+        }
+        marker.style.left = pos + "%";
+        raf = requestAnimationFrame(frame);
+      }
+      function press(e) {
+        if (e && e.type === "keydown" && !isActionKey(e)) return;
+        if (e) e.preventDefault();
+        const hit = zones.some(([a, b]) => pos >= a && pos <= b);
+        attempt += 1;
+        if (hit) {
+          hits += 1;
+          showToast("Jesús avanza en la subida");
+        } else {
+          changeResistance(-10, "Intento fallado: -10%");
+        }
+        if (hits >= 5) {
+          completeMoment(5);
+          return;
+        }
+        if (attempt >= 7) {
+          if (hits >= 5) completeMoment(5);
+          else {
+            changeResistance(-10, "Prueba incompleta: -10%");
+            attempt = 0;
+            hits = 0;
+          }
+        }
+        prompt.textContent = "Intento " + (attempt + 1) + " de 7 - Aciertos " + hits + " / 5";
+      }
+      action.addEventListener("click", press);
+      window.addEventListener("keydown", press);
+      raf = requestAnimationFrame(frame);
+      state.activeCleanup = () => {
+        cancelAnimationFrame(raf);
+        window.removeEventListener("keydown", press);
+      };
+    }
+
+    function playReactionNetwork() {
+      const makeBonds = (pairs) => pairs.map(([a, b]) => ({ a, b }));
+      const puzzles = [
+        {
+          title: "Separar la burla",
+          atoms: [
+            { id: "g", label: "A", word: "Amor", type: "good", x: 14, y: 50 },
+            { id: "n1", label: "C", word: "Carga", type: "neutral", x: 32, y: 50 },
+            { id: "c1", label: "B", word: "Burla", type: "bad", x: 50, y: 50 },
+            { id: "n2", label: "D", word: "Dolor", type: "neutral", x: 68, y: 50 },
+            { id: "c2", label: "O", word: "Odio", type: "bad", x: 86, y: 50 }
+          ],
+          bonds: makeBonds([["g","n1"],["n1","c1"],["c1","n2"],["n2","c2"]])
+        },
+        {
+          title: "Romper la cadena del rencor",
+          atoms: [
+            { id: "g", label: "F", word: "Fe", type: "good", x: 16, y: 50 },
+            { id: "a", label: "C", word: "Carga", type: "neutral", x: 36, y: 50 },
+            { id: "c1", label: "R", word: "Rencor", type: "bad", x: 54, y: 27 },
+            { id: "n", label: "D", word: "Dolor", type: "neutral", x: 56, y: 52 },
+            { id: "c2", label: "I", word: "Ira", type: "bad", x: 76, y: 37 },
+            { id: "c3", label: "V", word: "Venganza", type: "bad", x: 76, y: 68 }
+          ],
+          bonds: makeBonds([["g","a"],["a","c1"],["a","n"],["n","c2"],["n","c3"]])
+        },
+        {
+          title: "Dos ramas de esperanza",
+          atoms: [
+            { id: "g", label: "L", word: "Luz", type: "good", x: 50, y: 12 },
+            { id: "a1", label: "C", word: "Carga", type: "neutral", x: 32, y: 29 },
+            { id: "a2", label: "D", word: "Dolor", type: "neutral", x: 68, y: 29 },
+            { id: "c1", label: "B", word: "Burla", type: "bad", x: 23, y: 48 },
+            { id: "n1", label: "Q", word: "Quebranto", type: "neutral", x: 23, y: 68 },
+            { id: "c2", label: "O", word: "Odio", type: "bad", x: 36, y: 86 },
+            { id: "c3", label: "R", word: "Rencor", type: "bad", x: 77, y: 48 },
+            { id: "n2", label: "H", word: "Herida", type: "neutral", x: 77, y: 68 },
+            { id: "c4", label: "I", word: "Ira", type: "bad", x: 64, y: 86 }
+          ],
+          bonds: makeBonds([["g","a1"],["g","a2"],["a1","c1"],["c1","n1"],["n1","c2"],["a2","c3"],["c3","n2"],["n2","c4"]])
+        },
+        {
+          title: "Proteger el amor y la fe",
+          atoms: [
+            { id: "g1", label: "A", word: "Amor", type: "good", x: 20, y: 10 },
+            { id: "a1", label: "C", word: "Carga", type: "neutral", x: 20, y: 29 },
+            { id: "c1", label: "B", word: "Burla", type: "bad", x: 20, y: 48 },
+            { id: "n1", label: "D", word: "Dolor", type: "neutral", x: 20, y: 67 },
+            { id: "c2", label: "O", word: "Odio", type: "bad", x: 20, y: 86 },
+            { id: "g2", label: "F", word: "Fe", type: "good", x: 50, y: 10 },
+            { id: "a2", label: "H", word: "Herida", type: "neutral", x: 50, y: 29 },
+            { id: "c3", label: "R", word: "Rencor", type: "bad", x: 50, y: 48 },
+            { id: "n2", label: "Q", word: "Quebranto", type: "neutral", x: 50, y: 67 },
+            { id: "c4", label: "I", word: "Ira", type: "bad", x: 50, y: 86 },
+            { id: "g3", label: "L", word: "Luz", type: "good", x: 80, y: 10 },
+            { id: "a3", label: "P", word: "Peso", type: "neutral", x: 80, y: 29 },
+            { id: "c5", label: "V", word: "Venganza", type: "bad", x: 80, y: 48 },
+            { id: "n3", label: "T", word: "Tristeza", type: "neutral", x: 80, y: 67 },
+            { id: "c6", label: "M", word: "Maldad", type: "bad", x: 80, y: 86 }
+          ],
+          bonds: makeBonds([["g1","a1"],["a1","c1"],["c1","n1"],["n1","c2"],["g2","a2"],["a2","c3"],["c3","n2"],["n2","c4"],["g3","a3"],["a3","c5"],["c5","n3"],["n3","c6"]])
+        },
+        {
+          title: "La red final de esperanza",
+          atoms: [
+            { id: "g1", label: "A", word: "Amor", type: "good", x: 20, y: 10 },
+            { id: "g2", label: "F", word: "Fe", type: "good", x: 50, y: 10 },
+            { id: "g3", label: "L", word: "Luz", type: "good", x: 80, y: 10 },
+            { id: "a1", label: "C", word: "Carga", type: "neutral", x: 20, y: 28 },
+            { id: "a2", label: "D", word: "Dolor", type: "neutral", x: 50, y: 28 },
+            { id: "a3", label: "H", word: "Herida", type: "neutral", x: 80, y: 28 },
+            { id: "c1", label: "B", word: "Burla", type: "bad", x: 20, y: 45 },
+            { id: "n1", label: "Q", word: "Quebranto", type: "neutral", x: 20, y: 62 },
+            { id: "c2", label: "O", word: "Odio", type: "bad", x: 10, y: 82 },
+            { id: "c3", label: "R", word: "Rencor", type: "bad", x: 30, y: 82 },
+            { id: "c4", label: "I", word: "Ira", type: "bad", x: 50, y: 45 },
+            { id: "n2", label: "P", word: "Peso", type: "neutral", x: 50, y: 62 },
+            { id: "c5", label: "V", word: "Venganza", type: "bad", x: 42, y: 82 },
+            { id: "c6", label: "M", word: "Maldad", type: "bad", x: 58, y: 82 },
+            { id: "c7", label: "S", word: "Soberbia", type: "bad", x: 80, y: 45 },
+            { id: "n3", label: "T", word: "Tristeza", type: "neutral", x: 80, y: 62 },
+            { id: "c8", label: "E", word: "Engaño", type: "bad", x: 70, y: 82 },
+            { id: "c9", label: "J", word: "Injusticia", type: "bad", x: 90, y: 82 }
+          ],
+          bonds: makeBonds([["g1","a1"],["g2","a2"],["g3","a3"],["a1","a2"],["a2","a3"],["a1","c1"],["c1","n1"],["n1","c2"],["n1","c3"],["a2","c4"],["c4","n2"],["n2","c5"],["n2","c6"],["a3","c7"],["c7","n3"],["n3","c8"],["n3","c9"]])
+        }
+      ];
+
+      let puzzleIndex = 0;
+      let atoms = [];
+      let bonds = [];
+      let selectedId = null;
+      let previewRemoval = new Set();
+      let locked = false;
+      let transitionTimer = 0;
+
+      setMini(`
+        <div class="prompt" id="reactionPrompt">Red 1 de 5</div>
+        <div class="molecule-wrap">
+          <div class="molecule-stage" id="reactionStage">
+            <svg class="molecule-svg" id="reactionSvg" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+            <div class="molecule-flash" id="reactionFlash"></div>
+          </div>
+          <aside class="molecule-legend">
+            <h3>Purificar la red</h3>
+            <div class="legend-group"><strong>Esenciales dorados</strong> Amor, Fe y Luz deben permanecer.</div>
+            <div class="legend-group"><strong>Corrupción morada</strong> Debe desaparecer por completo.</div>
+            <div class="legend-group"><strong>Neutrales marrones</strong> Pueden utilizarse para provocar una reacción.</div>
+            <div class="legend-group"><strong>Regla</strong> Una reacción elimina el nodo elegido, sus vecinos y las ramas que queden sin una virtud esencial.</div>
+            <div class="molecule-actions"><button class="primary-btn" id="reactionRestart" type="button">↻ Reiniciar puzle</button></div>
+          </aside>
+        </div>
+        <div class="round-info" id="reactionInfo">Toca un nodo para ver la reacción. Tócalo nuevamente para confirmarla.</div>
+      `);
+
+      const stage = document.getElementById("reactionStage");
+      const svg = document.getElementById("reactionSvg");
+      const prompt = document.getElementById("reactionPrompt");
+      const info = document.getElementById("reactionInfo");
+      const flash = document.getElementById("reactionFlash");
+      const restart = document.getElementById("reactionRestart");
+
+      function atomById(id) {
+        return atoms.find(atom => atom.id === id);
+      }
+
+      function activeAtom(id) {
+        const atom = atomById(id);
+        return atom && !atom.destroyed ? atom : null;
+      }
+
+      function activeNeighbors(id, excluded = new Set()) {
+        const result = [];
+        bonds.forEach(bond => {
+          if (bond.a !== id && bond.b !== id) return;
+          const otherId = bond.a === id ? bond.b : bond.a;
+          const other = activeAtom(otherId);
+          if (other && !excluded.has(otherId)) result.push(otherId);
+        });
+        return result;
+      }
+
+      function reactionFor(id) {
+        const direct = new Set([id, ...activeNeighbors(id)]);
+        const remaining = atoms.filter(atom => !atom.destroyed && !direct.has(atom.id));
+        const remainingIds = new Set(remaining.map(atom => atom.id));
+        const visited = new Set();
+        const removal = new Set(direct);
+
+        remaining.forEach(atom => {
+          if (visited.has(atom.id)) return;
+          const component = [];
+          const queue = [atom.id];
+          visited.add(atom.id);
+          while (queue.length) {
+            const current = queue.shift();
+            component.push(current);
+            activeNeighbors(current, direct).forEach(next => {
+              if (remainingIds.has(next) && !visited.has(next)) {
+                visited.add(next);
+                queue.push(next);
+              }
+            });
+          }
+          const containsEssential = component.some(componentId => atomById(componentId).type === "good");
+          if (!containsEssential) component.forEach(componentId => removal.add(componentId));
+        });
+        return removal;
+      }
+
+      function drawNetwork() {
+        svg.innerHTML = "";
+        stage.querySelectorAll(".mol-atom").forEach(element => element.remove());
+        const dense = atoms.filter(atom => !atom.destroyed).length >= 15;
+        stage.classList.toggle("dense-network", dense);
+
+        bonds.forEach(bond => {
+          const first = activeAtom(bond.a);
+          const second = activeAtom(bond.b);
+          if (!first || !second) return;
+          const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+          line.setAttribute("x1", first.x);
+          line.setAttribute("y1", first.y);
+          line.setAttribute("x2", second.x);
+          line.setAttribute("y2", second.y);
+          line.classList.add("mol-bond", "normal");
+          if (previewRemoval.has(first.id) || previewRemoval.has(second.id)) line.classList.add("reaction-preview");
+          svg.appendChild(line);
+        });
+
+        atoms.forEach(atom => {
+          if (atom.destroyed) return;
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = `mol-atom ${atom.type}`;
+          button.style.left = atom.x + "%";
+          button.style.top = atom.y + "%";
+          button.textContent = atom.label;
+          button.title = atom.word;
+          button.setAttribute("aria-label", `${atom.word}. ${atom.type === "good" ? "Esencial" : atom.type === "bad" ? "Corrupción" : "Neutral"}`);
+          if (previewRemoval.has(atom.id)) button.classList.add("reaction-preview");
+          if (selectedId === atom.id) button.classList.add("reaction-origin");
+          button.addEventListener("click", () => chooseAtom(atom.id));
+          stage.appendChild(button);
+        });
+      }
+
+      function chooseAtom(id) {
+        if (locked || !activeAtom(id)) return;
+        if (selectedId !== id) {
+          selectedId = id;
+          previewRemoval = reactionFor(id);
+          const affectedWords = [...previewRemoval].map(atomId => atomById(atomId).word).join(", ");
+          info.textContent = `La reacción alcanzará: ${affectedWords}. Toca ${atomById(id).word} nuevamente para confirmar.`;
+          drawNetwork();
+          return;
+        }
+        executeReaction();
+      }
+
+      function executeReaction() {
+        const affected = [...previewRemoval].map(id => atomById(id));
+        const essential = affected.find(atom => atom.type === "good");
+        if (essential) {
+          selectedId = null;
+          previewRemoval = new Set();
+          changeResistance(-10, `${essential.word} sería dañada: -10%`);
+          info.textContent = "Esa reacción alcanza una virtud esencial. Busca otro nodo.";
+          drawNetwork();
+          return;
+        }
+
+        locked = true;
+        stage.querySelectorAll(".mol-atom.reaction-preview").forEach(element => element.classList.add("removing"));
+        transitionTimer = window.setTimeout(() => {
+          affected.forEach(atom => { atom.destroyed = true; });
+          selectedId = null;
+          previewRemoval = new Set();
+          locked = false;
+          drawNetwork();
+          checkComplete();
+        }, 340);
+      }
+
+      function checkComplete() {
+        const corruptedRemain = atoms.some(atom => atom.type === "bad" && !atom.destroyed);
+        if (corruptedRemain) {
+          const count = atoms.filter(atom => atom.type === "bad" && !atom.destroyed).length;
+          info.textContent = `Quedan ${count} elementos de corrupción. Elige la siguiente reacción.`;
+          return;
+        }
+
+        locked = true;
+        flash.textContent = puzzleIndex === puzzles.length - 1
+          ? "La red ha sido purificada. Permanecen la fe, el amor y la luz."
+          : "Red purificada. Las virtudes esenciales permanecen.";
+        flash.classList.add("show");
+        transitionTimer = window.setTimeout(() => {
+          flash.classList.remove("show");
+          puzzleIndex += 1;
+          if (puzzleIndex >= puzzles.length) completeMoment(5);
+          else loadPuzzle(puzzleIndex);
+        }, puzzleIndex === puzzles.length - 1 ? 1900 : 950);
+      }
+
+      function loadPuzzle(index) {
+        const puzzle = puzzles[index];
+        atoms = puzzle.atoms.map(atom => ({ ...atom, destroyed: false }));
+        bonds = puzzle.bonds.map(bond => ({ ...bond }));
+        selectedId = null;
+        previewRemoval = new Set();
+        locked = false;
+        prompt.textContent = `Red ${index + 1} de ${puzzles.length}: ${puzzle.title}`;
+        info.textContent = "Toca un nodo para ver la reacción. Tócalo nuevamente para confirmarla.";
+        drawNetwork();
+      }
+
+      restart.addEventListener("click", () => loadPuzzle(puzzleIndex));
+      loadPuzzle(0);
+      state.activeCleanup = () => window.clearTimeout(transitionTimer);
+    }
+
+    function playFinalPrecision() {
+      const badWords = { O: "Odio", M: "Mentira", B: "Burla", P: "Pecado", T: "Traición", V: "Violencia", R: "Rencor", S: "Soberbia", D: "Duda", I: "Injusticia" };
+      const goodWords = { A: "Amor", F: "Fe", E: "Esperanza", L: "Luz", G: "Gracia", C: "Compasión", Pz: "Paz", Vd: "Verdad", Dp: "Dominio propio" };
+      const neutralWords = { X: "Carga", H: "Humanidad", Q: "Quebranto" };
+      const puzzles = [
+        {
+          title: "La burla del camino",
+          atoms: [
+            { id: "a", label: "A", type: "good", x: 30, y: 34 },
+            { id: "b", label: "B", type: "bad", x: 50, y: 28 },
+            { id: "o", label: "O", type: "bad", x: 62, y: 52 },
+            { id: "f", label: "F", type: "good", x: 38, y: 62 }
+          ],
+          bonds: [
+            { a: "a", b: "b", type: "normal" },
+            { a: "b", b: "o", type: "normal" },
+            { a: "o", b: "f", type: "normal" }
+          ]
+        },
+        {
+          title: "La mentira y la duda",
+          atoms: [
+            { id: "vd", label: "Vd", type: "good", x: 28, y: 45 },
+            { id: "m", label: "M", type: "bad", x: 48, y: 34 },
+            { id: "d", label: "D", type: "bad", x: 60, y: 58 },
+            { id: "e", label: "E", type: "good", x: 76, y: 38 },
+            { id: "x", label: "X", type: "neutral", x: 40, y: 70 }
+          ],
+          bonds: [
+            { a: "vd", b: "m", type: "dark" },
+            { a: "m", b: "d", type: "normal" },
+            { a: "d", b: "e", type: "dark" },
+            { a: "x", b: "d", type: "normal" }
+          ]
+        },
+        {
+          title: "El peso del pecado",
+          atoms: [
+            { id: "g", label: "G", type: "good", x: 24, y: 28 },
+            { id: "p", label: "P", type: "bad", x: 45, y: 28 },
+            { id: "h", label: "H", type: "neutral", x: 55, y: 52 },
+            { id: "r", label: "R", type: "bad", x: 36, y: 70 },
+            { id: "c", label: "C", type: "good", x: 72, y: 70 },
+            { id: "q", label: "Q", type: "neutral", x: 76, y: 36 }
+          ],
+          bonds: [
+            { a: "g", b: "p", type: "dark" },
+            { a: "p", b: "h", type: "normal" },
+            { a: "h", b: "r", type: "normal" },
+            { a: "h", b: "c", type: "light" },
+            { a: "q", b: "c", type: "normal" },
+            { a: "p", b: "q", type: "normal" }
+          ]
+        },
+        {
+          title: "La maldad del mundo",
+          atoms: [
+            { id: "l", label: "L", type: "good", x: 18, y: 36 },
+            { id: "v", label: "V", type: "bad", x: 34, y: 24 },
+            { id: "t", label: "T", type: "bad", x: 52, y: 34 },
+            { id: "pz", label: "Pz", type: "good", x: 72, y: 24 },
+            { id: "i", label: "I", type: "bad", x: 80, y: 54 },
+            { id: "dp", label: "Dp", type: "good", x: 62, y: 76 },
+            { id: "s", label: "S", type: "bad", x: 40, y: 68 },
+            { id: "h", label: "H", type: "neutral", x: 24, y: 62 },
+            { id: "x", label: "X", type: "neutral", x: 54, y: 56 }
+          ],
+          bonds: [
+            { a: "l", b: "v", type: "dark" },
+            { a: "v", b: "t", type: "normal" },
+            { a: "t", b: "pz", type: "dark" },
+            { a: "pz", b: "i", type: "light" },
+            { a: "i", b: "dp", type: "dark" },
+            { a: "dp", b: "s", type: "light" },
+            { a: "s", b: "h", type: "normal" },
+            { a: "h", b: "l", type: "normal" },
+            { a: "t", b: "x", type: "normal" },
+            { a: "x", b: "s", type: "dark" },
+            { a: "x", b: "i", type: "normal" }
+          ]
+        }
+      ];
+      let puzzleIndex = 0;
+      let atoms = [];
+      let bonds = [];
+
+      setMini(`
+        <div class="prompt" id="molPrompt">Puzle 1 de 4</div>
+        <div class="molecule-wrap">
+          <div class="molecule-stage" id="moleculeStage">
+            <svg class="molecule-svg" id="moleculeSvg" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+            <div class="molecule-flash" id="moleculeFlash"></div>
+          </div>
+          <aside class="molecule-legend">
+            <h3>Leyenda espiritual</h3>
+            <div class="legend-group"><strong>Malos</strong> O Odio, M Mentira, B Burla, P Pecado, T Traición, V Violencia, R Rencor, S Soberbia, D Duda, I Injusticia.</div>
+            <div class="legend-group"><strong>Buenos</strong> A Amor, F Fe, E Esperanza, L Luz, G Gracia, C Compasión, Pz Paz, Vd Verdad, Dp Dominio propio.</div>
+            <div class="legend-group"><strong>Neutrales</strong> X Carga, H Humanidad, Q Quebranto.</div>
+            <div class="legend-group"><strong>Enlaces</strong> Gris normal, morado oscuro se puede cortar, dorado/celeste de luz no se debe cortar.</div>
+          </aside>
+        </div>
+        <div class="round-info" id="molInfo">Toca átomos malos. Corta primero enlaces oscuros peligrosos.</div>
+      `);
+      const stage = document.getElementById("moleculeStage");
+      const svg = document.getElementById("moleculeSvg");
+      const prompt = document.getElementById("molPrompt");
+      const info = document.getElementById("molInfo");
+      const flash = document.getElementById("moleculeFlash");
+
+      function atomById(id) {
+        return atoms.find(atom => atom.id === id);
+      }
+
+      function wordFor(atom) {
+        if (atom.type === "bad") return badWords[atom.label] || atom.label;
+        if (atom.type === "good") return goodWords[atom.label] || atom.label;
+        return neutralWords[atom.label] || atom.label;
+      }
+
+      function loadPuzzle(index) {
+        const puzzle = puzzles[index];
+        atoms = puzzle.atoms.map(atom => ({ ...atom, destroyed: false }));
+        bonds = puzzle.bonds.map((bond, i) => ({ ...bond, id: "bond-" + i, cut: false }));
+        prompt.textContent = "Puzle " + (index + 1) + " de 4: " + puzzle.title;
+        info.textContent = "Destruye la maldad sin dañar amor, fe, luz ni gracia.";
+        drawMolecule();
+      }
+
+      function drawMolecule() {
+        svg.innerHTML = "";
+        stage.querySelectorAll(".mol-atom").forEach(el => el.remove());
+        bonds.forEach((bond) => {
+          const a = atomById(bond.a);
+          const b = atomById(bond.b);
+          const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+          line.setAttribute("x1", a.x);
+          line.setAttribute("y1", a.y);
+          line.setAttribute("x2", b.x);
+          line.setAttribute("y2", b.y);
+          line.classList.add("mol-bond", bond.type);
+          if (bond.cut || a.destroyed || b.destroyed) line.classList.add("cut");
+          line.addEventListener("click", () => cutBond(bond.id));
+          svg.appendChild(line);
+        });
+        atoms.forEach((atom) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "mol-atom " + atom.type + (atom.destroyed ? " destroyed" : "");
+          btn.style.left = atom.x + "%";
+          btn.style.top = atom.y + "%";
+          btn.textContent = atom.label;
+          btn.title = wordFor(atom);
+          btn.addEventListener("click", () => hitAtom(atom.id));
+          stage.appendChild(btn);
+        });
+      }
+
+      function damageMolecule(amount, message) {
+        state.resistance = Math.max(0, state.resistance - amount);
+        updateResistance();
+        showToast(message);
+        if (state.resistance <= 0) {
+          flash.textContent = "Jesús necesita recuperar fuerzas. Se reinicia este puzle.";
+          flash.classList.add("show");
+          setTimeout(() => {
+            flash.classList.remove("show");
+            state.resistance = 40;
+            updateResistance();
+            loadPuzzle(puzzleIndex);
+          }, 1100);
+          return false;
+        }
+        return true;
+      }
+
+      function cutBond(id) {
+        const bond = bonds.find(item => item.id === id);
+        if (!bond || bond.cut) return;
+        if (bond.type === "light") {
+          damageMolecule(10, "No cortes un enlace de luz: -10%");
+          return;
+        }
+        if (bond.type !== "dark") {
+          showToast("Ese enlace no necesita cortarse");
+          return;
+        }
+        bond.cut = true;
+        showToast("Enlace oscuro cortado");
+        drawMolecule();
+      }
+
+      function hasDangerousGoodBond(atomId) {
+        return bonds.some((bond) => {
+          if (bond.cut || bond.type !== "dark") return false;
+          if (bond.a !== atomId && bond.b !== atomId) return false;
+          const other = atomById(bond.a === atomId ? bond.b : bond.a);
+          return other && !other.destroyed && other.type === "good";
+        });
+      }
+
+      function hitAtom(id) {
+        const atom = atomById(id);
+        if (!atom || atom.destroyed) return;
+        if (atom.type === "good") {
+          damageMolecule(10, "Átomo bueno dañado: -10%");
+          return;
+        }
+        if (atom.type === "bad" && hasDangerousGoodBond(atom.id)) {
+          damageMolecule(10, "Primero corta el enlace oscuro: -10%");
+          return;
+        }
+        atom.destroyed = true;
+        showToast(atom.type === "bad" ? "Maldad purificada" : "Carga separada");
+        drawMolecule();
+        checkMoleculeComplete();
+      }
+
+      function checkMoleculeComplete() {
+        const remainingBad = atoms.some(atom => atom.type === "bad" && !atom.destroyed);
+        if (remainingBad) return;
+        puzzleIndex += 1;
+        if (puzzleIndex >= puzzles.length) {
+          flash.textContent = "Cristo cargó con la maldad del mundo, pero la luz, el amor y la gracia permanecen.";
+          flash.classList.add("show");
+          setTimeout(() => {
+            flash.classList.remove("show");
+            completeMoment(5);
+          }, 2600);
+          return;
+        }
+        flash.textContent = "Puzle completado. La luz permanece.";
+        flash.classList.add("show");
+        setTimeout(() => {
+          flash.classList.remove("show");
+          loadPuzzle(puzzleIndex);
+        }, 1100);
+      }
+
+      loadPuzzle(0);
+      state.activeCleanup = () => {};
+    }
+
+    startBtn.addEventListener("click", startMoment);
+    mapBtn.addEventListener("click", backToMap);
+    bottomMapBtn.addEventListener("click", backToMap);
+    restartMomentBtn.addEventListener("click", () => {
+      modal.classList.remove("show");
+      cleanup();
+      if (state.current === 6 && !changeResistance(-2, "Reiniciar el puzle: -2%")) return;
+      startMoment();
+    });
+    bottomActionBtn.addEventListener("click", () => {
+      const action = miniInner.querySelector(".action");
+      if (action) action.click();
+      else window.dispatchEvent(new KeyboardEvent("keydown", { code: "Space", key: " " }));
+    });
+    modalBtn.addEventListener("click", retryCurrent);
+
+    buildMap();
+    updateResistance();
+  </script>
+</body>
+</html>

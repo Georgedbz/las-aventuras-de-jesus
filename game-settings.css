@@ -1,0 +1,92 @@
+:root {
+  --aventuras-touch-opacity: 68%;
+  --aventuras-ui-scale: 1;
+}
+
+html[data-text-size="large"] { --aventuras-ui-scale: 1.1; }
+html[data-text-size="xlarge"] { --aventuras-ui-scale: 1.2; }
+
+.aventuras-settings-overlay {
+  position: fixed;
+  z-index: 2147483646;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: max(14px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  background: rgba(6, 9, 25, .86);
+  backdrop-filter: blur(8px);
+  font-family: Inter, "Trebuchet MS", Arial, sans-serif;
+}
+
+.aventuras-settings-overlay.is-visible { display: flex; }
+
+.aventuras-settings-panel {
+  width: min(780px, 96vw);
+  max-height: min(92vh, 820px);
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  color: #fff7dd;
+  border: 2px solid #f2cb57;
+  border-radius: 22px;
+  background: linear-gradient(150deg, #172148, #0d1230 68%, #221444);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, .62), inset 0 0 35px rgba(72, 205, 255, .08);
+  transform: scale(var(--aventuras-ui-scale));
+  transform-origin: center;
+}
+
+.aventuras-settings-header,
+.aventuras-settings-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(242, 203, 87, .45);
+}
+
+.aventuras-settings-footer {
+  border-top: 1px solid rgba(242, 203, 87, .45);
+  border-bottom: 0;
+}
+
+.aventuras-settings-kicker { display: inline; margin: 0 8px 0 0; color: #f9d85f; font-size: 24px; }
+.aventuras-settings-header h2 { display: inline; margin: 0; font: 900 clamp(24px, 4vw, 34px)/1 Georgia, serif; color: #fff1b4; }
+.aventuras-settings-close { width: 42px; height: 42px; border-radius: 50%; border: 1px solid #f2cb57; color: #fff; background: #593773; font-size: 28px; cursor: pointer; }
+.aventuras-settings-scroll { overflow: auto; padding: 14px 18px 20px; scrollbar-color: #f2cb57 #111633; }
+.aventuras-setting-section { margin: 0 0 13px; padding: 14px; border: 1px solid rgba(109, 221, 255, .35); border-radius: 15px; background: rgba(6, 15, 40, .62); }
+.aventuras-setting-section h3 { margin: 0 0 10px; color: #8eeaff; font-size: 18px; }
+.aventuras-setting-note { margin: -4px 0 9px; color: #f9d85f; font-weight: 800; }
+.aventuras-control-guide { margin: 0; padding-left: 21px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px 22px; }
+.aventuras-setting-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.aventuras-setting-section label { display: grid; gap: 7px; color: #fff8dd; font-weight: 750; }
+.aventuras-setting-section select,
+.aventuras-setting-section input[type="range"] { width: 100%; box-sizing: border-box; }
+.aventuras-setting-section select { min-height: 42px; padding: 8px 10px; border: 1px solid #74dff4; border-radius: 9px; color: #fff; background: #20295b; font-weight: 700; }
+.aventuras-range { grid-template-columns: minmax(130px, 1fr) minmax(130px, 2fr) 48px; align-items: center; margin: 7px 0; }
+.aventuras-range output { color: #f9d85f; text-align: right; }
+.aventuras-check { display: flex !important; flex-direction: row; align-items: center; gap: 9px !important; min-height: 42px; }
+.aventuras-check input { width: 22px; height: 22px; accent-color: #f2cb57; }
+.aventuras-settings-footer button { min-height: 44px; padding: 9px 16px; border-radius: 11px; font-weight: 900; cursor: pointer; }
+.aventuras-reset-progress { border: 1px solid #ff8a8a; color: #ffe5e5; background: #6f2234; }
+.aventuras-settings-done { border: 1px solid #8eeaff; color: #071126; background: linear-gradient(#8eeaff, #48b9db); }
+
+.aventuras-high-contrast body { filter: contrast(1.14); }
+.aventuras-high-contrast .aventuras-settings-panel { border-color: #fff; }
+.aventuras-reduce-effects *,
+.aventuras-reduce-effects *::before,
+.aventuras-reduce-effects *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .001ms !important; }
+html[data-graphics="low"] body::before,
+html[data-graphics="low"] body::after { display: none !important; }
+
+@media (max-width: 650px), (max-height: 610px) {
+  .aventuras-settings-overlay { align-items: stretch; padding: 6px; }
+  .aventuras-settings-panel { width: 100%; max-height: 100%; border-radius: 14px; transform: none; }
+  .aventuras-settings-header, .aventuras-settings-footer { padding: 9px 11px; }
+  .aventuras-settings-scroll { padding: 8px 10px; }
+  .aventuras-setting-section { padding: 10px; margin-bottom: 8px; }
+  .aventuras-setting-grid, .aventuras-control-guide { grid-template-columns: 1fr; }
+  .aventuras-range { grid-template-columns: 1fr 1.4fr 42px; }
+}

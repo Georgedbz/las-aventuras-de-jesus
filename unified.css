@@ -1,0 +1,491 @@
+:root {
+  --unified-gold: #ffd861;
+  --unified-ink: #10132b;
+  --unified-blue: #17799f;
+  --unified-cream: #fff4cf;
+  --unified-touch-opacity: var(--aventuras-touch-opacity, 68%);
+  --unified-touch-size: 76px;
+}
+
+html.unified-platform {
+  background: #eaf7ff;
+}
+
+body.unified-game-page {
+  min-height: 100vh;
+  color: #132a46;
+  background:
+    radial-gradient(circle at 50% 0, rgba(255,255,255,.98), rgba(231,247,255,.94) 50%, rgba(209,237,249,.96)),
+    #eaf7ff;
+}
+
+.unified-stage-host {
+  position: relative !important;
+  isolation: isolate;
+}
+
+/* Los controles antiguos, separados del escenario, se sustituyen por el mando común. */
+html.unified-platform .play-controls,
+html.unified-platform .power-control-row,
+html.unified-platform .game-controls,
+html.unified-platform .next-controls,
+html.unified-platform #finalMessage {
+  display: none !important;
+}
+
+/* Reserva el rincón de audio/pausa/menú sin cubrir el título. */
+.unified-stage-host > h1:first-child,
+.unified-stage-host > h2:first-child {
+  box-sizing: border-box;
+  min-height: 48px;
+  margin-top: 0 !important;
+  padding-right: 158px;
+  padding-left: 12px;
+}
+
+.unified-top-controls {
+  position: absolute;
+  z-index: 2147482500;
+  top: max(6px, env(safe-area-inset-top));
+  right: max(7px, env(safe-area-inset-right));
+  display: flex;
+  gap: 5px;
+  padding: 4px;
+  border: 1px solid rgba(255, 216, 97, .66);
+  border-radius: 999px;
+  background: rgba(9, 27, 48, .38);
+  pointer-events: auto;
+}
+
+body > .unified-top-controls {
+  position: fixed;
+}
+
+.unified-top-button {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  padding: 0;
+  border: 2px solid rgba(255, 216, 97, .96);
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(17, 43, 67, .9);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, .3);
+  font: 900 19px/1 Arial, sans-serif;
+  cursor: pointer;
+  touch-action: manipulation;
+  backdrop-filter: blur(5px);
+  transition: transform .16s ease, background .16s ease;
+}
+
+.unified-top-button.is-muted {
+  color: #ffd5d5;
+  background: rgba(126, 39, 53, .94);
+}
+
+.unified-game-over-card {
+  border-color: #d64b33;
+  background: linear-gradient(145deg, #fff6d9, #ffc97b);
+}
+
+.unified-game-over-card #unified-game-over-title {
+  color: #a42020;
+  text-shadow: 0 2px 0 #fff2bd;
+}
+
+.unified-top-button:hover,
+.unified-top-button:focus-visible {
+  outline: 3px solid rgba(255,255,255,.86);
+  outline-offset: 2px;
+  background: #1b7398;
+  transform: scale(1.08);
+}
+
+.unified-overlay {
+  position: fixed;
+  z-index: 2147483600;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: max(20px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+  background: rgba(8, 10, 25, .84);
+  backdrop-filter: blur(6px);
+}
+
+.unified-overlay.is-visible { display: flex; }
+
+.unified-card {
+  width: min(680px, 94vw);
+  max-height: 88vh;
+  overflow: auto;
+  box-sizing: border-box;
+  padding: clamp(22px, 4vw, 38px);
+  border: 3px solid #bd772a;
+  border-radius: 24px;
+  color: #3d230d;
+  background: linear-gradient(145deg, #fff9df, #ffd98d);
+  box-shadow: 0 20px 65px rgba(0,0,0,.46), inset 0 0 28px rgba(255,255,255,.72);
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+
+.unified-card-eyebrow {
+  margin: 0 0 8px;
+  color: #8a3d1e;
+  font-size: clamp(13px, 2.4vw, 16px);
+  font-weight: 900;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.unified-card h2 {
+  margin: 0 0 14px;
+  color: #194f70;
+  font: 900 clamp(28px, 5vw, 44px)/1.04 Georgia, serif;
+}
+
+.unified-card p:not(.unified-card-eyebrow):not(.unified-verse) {
+  font-size: clamp(17px, 2.7vw, 22px);
+  line-height: 1.38;
+}
+
+.unified-teaching-text {
+  max-width: 590px;
+  margin: 0 auto 13px;
+  font-weight: 700;
+}
+
+.unified-verse {
+  margin: 0 0 22px;
+  color: #733a19;
+  font-size: clamp(15px, 2.4vw, 18px);
+  font-weight: 800;
+}
+
+.unified-card-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.unified-card-actions.two-columns { grid-template-columns: repeat(2, minmax(0,1fr)); }
+
+.unified-card-button {
+  min-height: 50px;
+  padding: 11px 16px;
+  border: 2px solid rgba(255,255,255,.6);
+  border-radius: 14px;
+  color: #fff;
+  background: linear-gradient(#2c94c2, #145e8f);
+  box-shadow: 0 5px 0 #0d3b5b;
+  font: 900 clamp(15px, 2.3vw, 18px)/1.15 Arial, sans-serif;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform .15s ease, filter .15s ease;
+}
+
+.unified-card-button.primary { background: linear-gradient(#39a969, #167644); box-shadow-color: #0b4b2a; }
+.unified-card-button.warning { background: linear-gradient(#ef8c3d, #b64725); box-shadow-color: #723019; }
+.unified-card-button.home { background: linear-gradient(#7d59ba, #4b2b87); box-shadow-color: #29164d; }
+
+.unified-card-button:hover,
+.unified-card-button:focus-visible {
+  outline: 3px solid rgba(255,255,255,.86);
+  transform: translateY(-2px) scale(1.015);
+  filter: brightness(1.08);
+}
+
+/* Mando táctil común, siempre dentro del área de juego. */
+.unified-touch-controls {
+  position: absolute;
+  z-index: 2147482400;
+  left: 0;
+  right: 0;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  display: none;
+  align-items: flex-end;
+  justify-content: space-between;
+  box-sizing: border-box;
+  padding: 0 max(14px, env(safe-area-inset-right)) 0 max(14px, env(safe-area-inset-left));
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.unified-touch-controls.is-visible { display: flex; }
+
+.unified-dpad {
+  position: relative;
+  width: calc(var(--unified-touch-size) * 2.18);
+  height: calc(var(--unified-touch-size) * 2.18);
+  opacity: var(--unified-touch-opacity);
+  pointer-events: none;
+}
+
+.unified-pad-button,
+.unified-pad-center,
+.unified-action-button {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 3px solid rgba(255,255,255,.82);
+  color: #fff;
+  background: rgba(24, 64, 92, .76);
+  box-shadow: 0 5px 12px rgba(0,0,0,.28), inset 0 0 12px rgba(255,255,255,.14);
+  font: 900 calc(var(--unified-touch-size) * .35)/1 Arial, sans-serif;
+  pointer-events: auto;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.unified-pad-button,
+.unified-pad-center {
+  width: var(--unified-touch-size);
+  height: var(--unified-touch-size);
+  border-radius: 18px;
+}
+
+.unified-pad-button.up { top: 0; left: 50%; transform: translateX(-50%); }
+.unified-pad-button.left { top: 50%; left: 0; transform: translateY(-50%); }
+.unified-pad-center { top: 50%; left: 50%; transform: translate(-50%,-50%); background: rgba(17,43,67,.62); pointer-events: none; }
+.unified-pad-button.right { top: 50%; right: 0; transform: translateY(-50%); }
+.unified-pad-button.down { bottom: 0; left: 50%; transform: translateX(-50%); }
+
+.unified-action-pad {
+  position: relative;
+  width: calc(var(--unified-touch-size) * 2.25);
+  height: calc(var(--unified-touch-size) * 2.05);
+  opacity: var(--unified-touch-opacity);
+  pointer-events: none;
+}
+
+.unified-action-button {
+  width: var(--unified-touch-size);
+  height: var(--unified-touch-size);
+  border-radius: 50%;
+  line-height: 1;
+  text-shadow: 0 2px 3px rgba(0,0,0,.45);
+}
+
+.unified-action-button b { font-size: calc(var(--unified-touch-size) * .42); }
+.unified-action-button small { position: absolute; bottom: 8px; font-size: 9px; font-weight: 900; text-transform: uppercase; }
+.unified-action-button.action-a { left: 0; bottom: 0; background: rgba(49,149,216,.78); }
+.unified-action-button.action-b { right: 0; top: 0; background: rgba(219,75,77,.78); }
+.unified-action-button.action-c { right: 0; bottom: 0; width: calc(var(--unified-touch-size) * .78); height: calc(var(--unified-touch-size) * .78); background: rgba(232,174,20,.86); }
+
+.unified-action-button.action-c.is-active {
+  background: rgba(255,204,35,.98);
+  box-shadow: 0 0 0 5px rgba(255,218,79,.3), 0 0 20px #ffd84f;
+}
+
+.unified-pad-button.is-pressed,
+.unified-action-button.is-pressed {
+  filter: brightness(1.35);
+  transform: scale(.93);
+}
+
+.unified-pad-button.up.is-pressed { transform: translateX(-50%) scale(.93); }
+.unified-pad-button.left.is-pressed { transform: translateY(-50%) scale(.93); }
+.unified-pad-button.right.is-pressed { transform: translateY(-50%) scale(.93); }
+.unified-pad-button.down.is-pressed { transform: translateX(-50%) scale(.93); }
+
+.unified-action-hint {
+  position: absolute;
+  z-index: 2147482450;
+  right: max(18px, env(safe-area-inset-right));
+  bottom: calc(var(--unified-touch-size) * 2.15 + 18px);
+  display: none;
+  padding: 8px 13px;
+  border: 2px solid #ffe678;
+  border-radius: 999px;
+  color: #fff8c7;
+  background: rgba(16,19,43,.9);
+  box-shadow: 0 0 18px rgba(255,216,97,.45);
+  font: 900 13px/1 Arial, sans-serif;
+}
+
+.unified-action-hint.is-visible,
+.unified-action-available .unified-action-hint { display: block; }
+
+html[data-touch-size="small"] { --unified-touch-size: 60px; }
+html[data-touch-size="large"] { --unified-touch-size: 88px; }
+
+/* Las escenas antiguas ganan claridad sin cambiar su mecánica. */
+html.unified-platform h1,
+html.unified-platform h2,
+html.unified-platform h3 { text-wrap: balance; }
+
+html.unified-platform canvas,
+html.unified-platform iframe,
+html.unified-platform .game-stage,
+html.unified-platform #gameCanvas {
+  max-width: 100%;
+  image-rendering: auto;
+}
+
+/* Avisos visibles cuando la salida está bloqueada por un requisito pendiente. */
+.unified-requirement-warning {
+  position: relative;
+  border-radius: 10px;
+  animation: unifiedRequirementPulse 1s ease-in-out infinite;
+}
+
+.unified-requirement-warning::after {
+  content: attr(data-unified-warning);
+  display: block;
+  width: fit-content;
+  max-width: min(94%, 620px);
+  margin: 5px auto 2px;
+  padding: 6px 12px;
+  border: 2px solid #ffcd42;
+  border-radius: 999px;
+  color: #5a210b;
+  background: #fff0a8;
+  box-shadow: 0 0 18px rgba(255, 196, 35, .72);
+  font-size: .78em;
+  line-height: 1.15;
+}
+
+@keyframes unifiedRequirementPulse {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.22); }
+}
+
+/* Las preguntas del jefe del nivel 7 permanecen dentro de la pantalla. */
+.unified-in-stage-panel {
+  position: absolute !important;
+  z-index: 60 !important;
+  left: 3% !important;
+  right: 3% !important;
+  bottom: 10px !important;
+  width: auto !important;
+  max-width: none !important;
+  max-height: 38% !important;
+  margin: 0 !important;
+  overflow: auto !important;
+  box-sizing: border-box !important;
+  background: rgba(255, 248, 212, .96) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .36) !important;
+}
+
+/* Nivel 8: tres franjas superiores compactas y más escenario disponible. */
+html.unified-level-8 .bible-platform-game {
+  width: min(100%, 1040px) !important;
+  max-width: 1040px !important;
+  margin: 4px auto !important;
+  padding: 4px 8px !important;
+  box-sizing: border-box;
+}
+
+html.unified-level-8 .bible-platform-game > h2 {
+  min-height: 40px;
+  margin: 0 !important;
+  padding-right: 146px;
+  font-size: clamp(20px, 2.4vw, 27px) !important;
+  line-height: 1.05 !important;
+}
+
+html.unified-level-8 .bible-platform-game > p {
+  margin: 1px 145px 2px 4px !important;
+  font-size: clamp(12px, 1.55vw, 16px) !important;
+  line-height: 1.1 !important;
+}
+
+html.unified-level-8 .scripture-card {
+  display: none !important;
+}
+
+html.unified-level-8 #gameMessage {
+  min-height: 0 !important;
+  margin: 2px auto 5px !important;
+  padding: 4px 8px !important;
+  font-size: clamp(14px, 1.8vw, 18px) !important;
+  line-height: 1.08 !important;
+}
+
+html.unified-level-8 #gameCanvas {
+  width: min(100%, 980px) !important;
+  max-width: 980px !important;
+  max-height: calc(100vh - 132px) !important;
+  object-fit: contain;
+}
+
+/* Nivel 9 se presenta como un juego contenido, no como una página desbordada. */
+html.unified-level-9 body.unified-game-page {
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  padding: clamp(3px, 1.2vw, 15px);
+  overflow: hidden;
+  background: #eaf7ff !important;
+}
+
+html.unified-level-9 .level9-frame {
+  width: min(100%, 1280px) !important;
+  height: min(100%, 820px) !important;
+  border: 3px solid #286f94 !important;
+  border-radius: 15px;
+  background: #24140d;
+  box-shadow: 0 12px 30px rgba(17, 52, 76, .28);
+}
+
+@media (pointer: coarse), (max-width: 900px) {
+  :root { --unified-touch-size: 68px; }
+  .unified-top-controls { top: max(6px, env(safe-area-inset-top)); right: max(6px, env(safe-area-inset-right)); gap: 5px; }
+  .unified-top-button { width: 38px; height: 38px; font-size: 18px; }
+}
+
+@media (max-width: 700px), (max-height: 560px) {
+  :root { --unified-touch-size: 58px; }
+  .unified-card { padding: 19px 16px 23px; }
+  .unified-card-actions { grid-template-columns: 1fr; gap: 9px; }
+  .unified-card-actions.two-columns { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .unified-card-button { min-height: 45px; }
+  .unified-touch-controls { bottom: max(7px, env(safe-area-inset-bottom)); padding-inline: max(8px, env(safe-area-inset-left)); }
+  .unified-action-button small { display: none; }
+  .unified-stage-host > h1:first-child,
+  .unified-stage-host > h2:first-child {
+    min-height: 40px;
+    padding-right: 122px;
+    padding-left: 4px;
+    font-size: clamp(16px, 5vw, 22px) !important;
+  }
+  .unified-top-controls { padding: 2px; gap: 3px; }
+  .unified-top-button { width: 34px; height: 34px; font-size: 16px; }
+  .unified-in-stage-panel { left: 1.5% !important; right: 1.5% !important; bottom: 5px !important; max-height: 44% !important; }
+  html.unified-level-8 .bible-platform-game > h2 { min-height: 36px; padding-right: 116px; }
+  html.unified-level-8 .bible-platform-game > p { margin-right: 4px !important; }
+  html.unified-level-8 #gameCanvas { max-height: calc(100vh - 104px) !important; }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  :root { --unified-touch-size: 52px; }
+  .unified-top-button { width: 34px; height: 34px; }
+  .unified-action-hint { bottom: calc(var(--unified-touch-size) * 2 + 8px); }
+}
+
+html.aventuras-reduce-effects .unified-top-button,
+html.aventuras-reduce-effects .unified-card-button,
+html.aventuras-reduce-effects .unified-pad-button,
+html.aventuras-reduce-effects .unified-action-button {
+  transition: none !important;
+}
+
+html.aventuras-reduce-effects .unified-requirement-warning {
+  animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .unified-top-button,
+  .unified-card-button,
+  .unified-pad-button,
+  .unified-action-button { transition: none !important; }
+}
