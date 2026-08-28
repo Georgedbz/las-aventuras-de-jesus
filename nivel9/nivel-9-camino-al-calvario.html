@@ -1696,7 +1696,7 @@
       if (location.protocol === "file:" || document.getElementById("tramo2PreloadWasm")) return;
       const resources = [
         ["tramo2PreloadWasm", "tramo2/index.wasm", "application/wasm"],
-        ["tramo2PreloadPack", "tramo2/index.pck", "application/octet-stream"]
+        ["tramo2PreloadPack", "tramo2/index.pck?v=progresivo-20260827", "application/octet-stream"]
       ];
       resources.forEach(([id, href, type]) => {
         const link = document.createElement("link");
@@ -3602,6 +3602,7 @@
 
     buildMap();
     updateResistance();
+    setTimeout(preloadTramo2Resources, 900);
   </script>
 </body>
 </html>
