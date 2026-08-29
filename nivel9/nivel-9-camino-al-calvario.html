@@ -1949,7 +1949,10 @@
           return;
         }
         if (event.data.type === "tramo_2_caida_vacio") {
-          if (!hasOnlyMessageKeys(event.data, ["type"])) return;
+          if (
+            !hasOnlyMessageKeys(event.data, ["type", "penalty"]) ||
+            event.data.penalty !== 5
+          ) return;
           changeResistance(-5, "Caída al vacío: -5% de resistencia");
           return;
         }
