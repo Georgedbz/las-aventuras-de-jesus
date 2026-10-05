@@ -1790,7 +1790,7 @@
     function showRetry() {
       cleanup();
       modalTitle.textContent = "Resistencia agotada";
-      modalText.textContent = "La resistencia llegó a 0%. El Nivel 9 se reiniciará desde el primer tramo con 50% de resistencia.";
+      modalText.textContent = "La resistencia llegó a 0%. El Nivel 9 se reiniciará desde el primer tramo con 100% de resistencia.";
       modalBtn.textContent = "Reiniciar Nivel 9";
       modal.classList.add("show");
     }
@@ -1810,7 +1810,8 @@
       if (state.current >= 7) return;
       state.current = 0;
       state.completed.clear();
-      state.resistance = 50;
+      state.resistance = 100;
+      localStorage.removeItem("senderosDeLuzTramo3V1");
       updateResistance();
       updateMap();
       startMoment();
@@ -2661,6 +2662,7 @@
       let moves = 0;
       let dragState = null;
       let puzzleLocked = false;
+      let puzzleLoadToken = 0;
       setMini(`
         <div class="prompt">Rompecabezas del camino - imagen 1 de 6</div>
         <div class="puzzle-wrap">
@@ -2721,15 +2723,38 @@
         tile.style.backgroundPosition = style.position;
       }
 
-      function drawPuzzle() {
+      function preloadPuzzleImage(src) {
+        const image = new Image();
+        const loaded = new Promise((resolve, reject) => {
+          image.onload = resolve;
+          image.onerror = reject;
+        });
+        image.src = src;
+        if (typeof image.decode === "function") {
+          return image.decode().catch(() => loaded).then(() => image);
+        }
+        return loaded.then(() => image);
+      }
+
+      async function drawPuzzle() {
+        const loadToken = ++puzzleLoadToken;
         cleanupDrag();
         selected = null;
         moves = 0;
-        puzzleLocked = false;
+        puzzleLocked = true;
         const layout = layouts[level];
         const pieceCount = layout.cols * layout.rows;
-        shuffle(pieceCount);
         board.innerHTML = "";
+        board.setAttribute("aria-busy", "true");
+        info.textContent = "Preparando rompecabezas…";
+        try {
+          await preloadPuzzleImage(images[level]);
+        } catch {
+          if (loadToken === puzzleLoadToken) info.textContent = "No se pudo preparar la imagen del rompecabezas.";
+          return;
+        }
+        if (loadToken !== puzzleLoadToken) return;
+        shuffle(pieceCount);
         board.style.setProperty("--puzzle-cols", layout.cols);
         board.style.setProperty("--puzzle-rows", layout.rows);
         preview.src = images[level];
@@ -2754,6 +2779,8 @@
           });
           board.appendChild(tile);
         });
+        board.removeAttribute("aria-busy");
+        puzzleLocked = false;
       }
 
       function beginDrag(event, slot, tile) {
@@ -2866,7 +2893,10 @@
       }
 
       drawPuzzle();
-      state.activeCleanup = cleanupDrag;
+      state.activeCleanup = () => {
+        puzzleLoadToken += 1;
+        cleanupDrag();
+      };
     }
 
     function playWords() {
