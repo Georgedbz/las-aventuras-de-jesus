@@ -1527,7 +1527,7 @@
       </div>
       <footer class="game-controls">
         <button class="secondary-btn" id="bottomMapBtn" type="button">Mapa</button>
-        <button class="secondary-btn" id="restartMomentBtn" type="button">Reiniciar momento</button>
+        <button class="secondary-btn" id="restartMomentBtn" type="button">Reiniciar Tramo 7</button>
         <button class="primary-btn" id="bottomActionBtn" type="button">Acción</button>
       </footer>
     </section>
@@ -1761,6 +1761,7 @@
       challengeTitle.textContent = moment.title;
       challengeText.textContent = moment.text;
       screen.classList.add("active");
+      restartMomentBtn.style.display = state.current === 6 ? "" : "none";
       startPanel.style.display = "none";
       const runners = [playPrecision, playBalanceGodot, playCircuitoEsperanza, playRunner, playSimon, playWords, playReactionGodot];
       runners[state.current]();
@@ -3634,9 +3635,15 @@
     mapBtn.addEventListener("click", backToMap);
     bottomMapBtn.addEventListener("click", backToMap);
     restartMomentBtn.addEventListener("click", () => {
+      if (state.current !== 6) return;
+      const confirmed = window.confirm("¿Deseas reiniciar todo el Tramo 7? Se perderá el progreso de los 8 puzzles de este tramo.");
+      if (!confirmed) return;
       modal.classList.remove("show");
       cleanup();
-      if (state.current === 6 && !changeResistance(-2, "Reiniciar el puzle: -2%")) return;
+      state.completed.delete(6);
+      state.current = 6;
+      state.moment7HintsRemaining = 3;
+      saveLevel9Progress();
       startMoment();
     });
     bottomActionBtn.addEventListener("click", () => {
