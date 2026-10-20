@@ -1832,6 +1832,12 @@
       let pos = 0;
       let dir = 1;
       let raf = 0;
+      let inputLocked = false;
+      let resumeTimer = 0;
+      let frozenPos = 0;
+      const precisionStepMs = 1000 / 60;
+      let precisionPreviousFrameTime = null;
+      let precisionAccumulatorMs = 0;
       const levels = [
         { speed: 1.05, start: 12, end: 28 },
         { speed: 1.30, start: 68, end: 84 },
@@ -1871,12 +1877,33 @@
         track.setAttribute("aria-label", `Nivel ${round + 1}: zona verde entre ${level.start} y ${level.end} por ciento`);
         levelNumber.textContent = round + 1;
       }
-      function frame() {
-        if (window.__unifiedPaused) { raf = requestAnimationFrame(frame); return; }
-        pos += dir * levels[round].speed;
-        if (pos >= 100 || pos <= 0) {
-          dir *= -1;
-          pos = Math.max(0, Math.min(100, pos));
+      function frame(now) {
+        if (window.__unifiedPaused) {
+          precisionPreviousFrameTime = now;
+          precisionAccumulatorMs = 0;
+          raf = requestAnimationFrame(frame);
+          return;
+        }
+        if (inputLocked) {
+          precisionPreviousFrameTime = now;
+          precisionAccumulatorMs = 0;
+          marker.style.left = frozenPos + "%";
+          raf = requestAnimationFrame(frame);
+          return;
+        }
+        if (precisionPreviousFrameTime === null) precisionPreviousFrameTime = now;
+        const elapsed = Math.max(0, Math.min(now - precisionPreviousFrameTime, 100));
+        precisionPreviousFrameTime = now;
+        precisionAccumulatorMs = Math.min(precisionAccumulatorMs + elapsed, 100);
+        let steps = 0;
+        while (precisionAccumulatorMs + 0.0001 >= precisionStepMs && steps < 6) {
+          pos += dir * levels[round].speed;
+          if (pos >= 100 || pos <= 0) {
+            dir *= -1;
+            pos = Math.max(0, Math.min(100, pos));
+          }
+          precisionAccumulatorMs = Math.max(0, precisionAccumulatorMs - precisionStepMs);
+          steps += 1;
         }
         marker.style.left = pos + "%";
         raf = requestAnimationFrame(frame);
@@ -1884,20 +1911,38 @@
       function press(e) {
         if (e && e.type === "keydown" && !isActionKey(e)) return;
         if (e) e.preventDefault();
+        if (inputLocked) return;
+        inputLocked = true;
+        action.disabled = true;
+        frozenPos = pos;
+        marker.style.left = frozenPos + "%";
         const level = levels[round];
-        const hit = pos >= level.start && pos <= level.end;
+        const hit = frozenPos >= level.start && frozenPos <= level.end;
+        let canContinue = true;
         if (hit) changeResistance(0.5, "Acierto: +0.50%");
-        else if (!changeResistance(-5, "Error leve: -5%")) return;
-        round += 1;
-        if (round >= levels.length) completeMoment(0);
-        else showLevel();
+        else canContinue = changeResistance(-5, "Error leve: -5%");
+        resumeTimer = window.setTimeout(() => {
+          resumeTimer = 0;
+          inputLocked = false;
+          action.disabled = false;
+          if (!canContinue) return;
+          round += 1;
+          if (round >= levels.length) completeMoment(0);
+          else {
+            showLevel();
+            precisionPreviousFrameTime = performance.now();
+            precisionAccumulatorMs = 0;
+          }
+        }, 1000);
       }
       showLevel();
       action.addEventListener("click", press);
       window.addEventListener("keydown", press);
       raf = requestAnimationFrame(frame);
       state.activeCleanup = () => {
+        inputLocked = true;
         cancelAnimationFrame(raf);
+        window.clearTimeout(resumeTimer);
         window.removeEventListener("keydown", press);
       };
     }
