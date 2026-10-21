@@ -96,7 +96,7 @@
     {
       speaker: "Satanás",
       title: "Una última pregunta",
-      text: "En la Escritura se menciona que los demonios también creen y tiemblan, pero los seres humanos no lo hacen. Entonces, ¿en qué posición quedamos nosotros?",
+      text: "Aun los demonios creen y tiemblan. Si los seres humanos dicen creer, pero no obedecen a Dios ni ponen su fe por obra, dime, Jesús: ¿qué diferencia hay entre nosotros y ellos? ¿Por qué habrías de luchar y entregar tu vida por ellos?",
       reference: "Santiago 2:19"
     },
     {
@@ -939,15 +939,15 @@
     }
 
     const slopes = [
-      { x: 115, y: 2400, w: 850, h: 22, slope: -145, slopeRun: true },
-      { x: 315, y: 2110, w: 850, h: 22, slope: 145, slopeRun: true },
-      { x: 115, y: 1980, w: 850, h: 22, slope: -145, slopeRun: true },
-      { x: 315, y: 1690, w: 850, h: 22, slope: 145, slopeRun: true },
-      { x: 115, y: 1560, w: 850, h: 22, slope: -145, slopeRun: true },
-      { x: 315, y: 1270, w: 850, h: 22, slope: 145, slopeRun: true },
-      { x: 115, y: 1140, w: 850, h: 22, slope: -145, slopeRun: true },
-      { x: 315, y: 850, w: 850, h: 22, slope: 145, slopeRun: true },
-      { x: 115, y: 720, w: 850, h: 22, slope: -145, slopeRun: true }
+      { x: 115, y: 2400, w: 850, h: 22, slope: -100, slopeRun: true },
+      { x: 315, y: 2110, w: 850, h: 22, slope: 100, slopeRun: true },
+      { x: 115, y: 1980, w: 850, h: 22, slope: -100, slopeRun: true },
+      { x: 315, y: 1690, w: 850, h: 22, slope: 100, slopeRun: true },
+      { x: 115, y: 1560, w: 850, h: 22, slope: -100, slopeRun: true },
+      { x: 315, y: 1270, w: 850, h: 22, slope: 100, slopeRun: true },
+      { x: 115, y: 1140, w: 850, h: 22, slope: -100, slopeRun: true },
+      { x: 315, y: 850, w: 850, h: 22, slope: 100, slopeRun: true },
+      { x: 115, y: 720, w: 850, h: 22, slope: -100, slopeRun: true }
     ];
     const pillarSlopeIndexes = new Set([0, 2, 4, 6, 8]);
     slopes.forEach((platform, index) => {
@@ -2509,13 +2509,18 @@
       if (!isWorldVisible(pillar.x - 35, pillar.y - 70, 70, 100)) return;
       ctx.save();
       ctx.translate(pillar.x, pillar.y);
-      ctx.fillStyle = pillar.lit ? "#fff5c2" : "#413b62";
+      ctx.fillStyle = pillar.lit ? "#fff5c2" : "#a9784f";
       ctx.fillRect(-17, 5, 34, 57);
-      ctx.fillStyle = pillar.lit ? pillar.color : "#6f668d";
+      ctx.fillStyle = pillar.lit ? pillar.color : "#d0a066";
       ctx.fillRect(-25, 57, 50, 9);
       ctx.beginPath();
       ctx.arc(0, 0, pillar.lit ? 20 : 14, 0, Math.PI * 2);
       ctx.fill();
+      if (!pillar.lit) {
+        ctx.strokeStyle = "#f0c98a";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(-17, 5, 34, 57);
+      }
       if (pillar.lit) {
         ctx.globalAlpha = 0.4;
         ctx.fillStyle = pillar.color;
