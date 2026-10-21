@@ -215,6 +215,12 @@
       showTeaching(10);
       return;
     }
+    if (data.type === "nivel10-menu-principal") {
+      if (!isFrameMessageSource(event, 'iframe[src^="nivel10/index.html"]') ||
+          !hasOnlyMessageKeys(data, ["type"])) return;
+      returnToMenu();
+      return;
+    }
     if (data.type === "unified-progress") {
       if (event.source !== window ||
           !hasOnlyMessageKeys(data, ["type", "level", "label"]) ||
@@ -615,6 +621,10 @@
   function advanceAfterTeaching() {
     const finishedLevel = teachingLevel;
     if (!finishedLevel) return;
+    if (finishedLevel >= 10) {
+      const level10Frame = document.querySelector('iframe[src^="nivel10/index.html"]');
+      level10Frame?.contentWindow?.postMessage({ type: "nivel10-ensenanza-final-cerrada" }, INTERNAL_ORIGIN);
+    }
     teachingLevel = 0;
     teachingOverlay.classList.remove("is-visible");
     setPaused(false, false);

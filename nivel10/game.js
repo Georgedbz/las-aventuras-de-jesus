@@ -187,6 +187,7 @@
     finalApproach: false,
     satanGone: false,
     finalFloorMusicActive: false,
+    finalTeachingPending: false,
     doorActive: false,
     doorEntered: false,
     musicFade: 0,
@@ -305,7 +306,11 @@
     ui.retry.addEventListener("click", retryPhase);
     ui.dialogueNext.addEventListener("click", advanceDialogue);
     ui.finish.addEventListener("click", () => {
-      window.parent.location.href = "index.html";
+      if (window.parent !== window) {
+        window.parent.postMessage({ type: "nivel10-menu-principal" }, INTERNAL_ORIGIN);
+      } else {
+        window.location.href = "../index.html";
+      }
     });
     ui.sound.addEventListener("click", toggleSound);
     ui.pause.addEventListener("click", togglePause);
@@ -318,6 +323,11 @@
       if (event.data?.type === "aventuras-settings") {
         if (!hasOnlyMessageKeys(event.data, ["type", "settings"]) || !isValidExternalSettings(event.data.settings)) return;
         applyExternalSettings(event.data.settings);
+        return;
+      }
+      if (event.data?.type === "nivel10-ensenanza-final-cerrada") {
+        if (!hasOnlyMessageKeys(event.data, ["type"])) return;
+        startCreditsAfterFinalTeaching();
         return;
       }
       if (event.data.type !== "unified-game-pause" ||
@@ -418,7 +428,9 @@
       ui.music.volume = levelMusicVolume();
       ui.finalMusic.volume = finalMusicVolume();
       ui.creditsMusic.volume = creditsMusicVolume();
-      const activeMusic = ui.victory.classList.contains("visible")
+      const activeMusic = state.finalTeachingPending
+        ? ui.finalMusic
+        : ui.victory.classList.contains("visible")
         ? ui.creditsMusic
         : state.finalFloorMusicActive
           ? ui.finalMusic
@@ -563,6 +575,7 @@
     state.finalApproach = false;
     state.satanGone = false;
     state.finalFloorMusicActive = false;
+    state.finalTeachingPending = false;
     state.doorActive = false;
     state.doorEntered = false;
     state.musicFade = 0;
@@ -1773,6 +1786,7 @@
 
   function completeAdventure() {
     state.running = false;
+    state.finalTeachingPending = true;
     window.parent.postMessage({ type: "nivel10-completado" }, window.location.origin);
     localStorage.removeItem(SAVE_KEY);
     try {
@@ -1791,13 +1805,22 @@
       }));
     }
     ui.music.pause();
+    ui.victory.classList.add("visible");
+    if (window.parent === window) startCreditsAfterFinalTeaching();
+  }
+
+  function startCreditsAfterFinalTeaching() {
+    if (!state.finalTeachingPending) return;
+    state.finalTeachingPending = false;
+    state.finalFloorMusicActive = false;
+    state.resumeFinalMusic = false;
     ui.finalMusic.pause();
+    ui.finalMusic.currentTime = 0;
     if (canPlayAudio()) {
       ui.creditsMusic.volume = creditsMusicVolume();
       ui.creditsMusic.currentTime = 0;
       ui.creditsMusic.play().catch(() => {});
     }
-    ui.victory.classList.add("visible");
   }
 
   function damage(message) {
